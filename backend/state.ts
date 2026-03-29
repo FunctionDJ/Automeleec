@@ -1,58 +1,96 @@
-import { on } from "node:events";
+import type { Stage } from "@slippi/slippi-js/node";
+import { type } from "arktype";
 import { EventEmitter } from "node:stream";
 import type { SetState } from "../shared/schema-utils";
 
-type Players = {
+export const PlayerInCurrentSet = type({
+	startggParticipantId: "number|null",
+	tag: "string",
+	pronouns: "string",
+	character: type("number|null"),
+	characterColor: type("number|null"),
+});
+
+export type PlayerInCurrentSet = typeof PlayerInCurrentSet.infer;
+
+export interface PlayerInUpcomingSet {
 	tag: string;
 	pronouns: string;
-	stockIcon: string;
-	score: number | null;
-}[];
+}
 
-interface CurrentSet {
-	id: number;
+export interface EntrantInCurrentSet {
+	startggEntrantId: number;
+	player1: PlayerInCurrentSet;
+	player2: PlayerInCurrentSet | null;
+	score: number | null;
+}
+
+export interface CurrentSet {
+	startggSetId: number;
 	state: typeof SetState.infer;
 	phaseGroupDisplayIdentifier: string | null;
 	startedAt: Date | null;
-	players: Players;
+	entrantA: EntrantInCurrentSet;
+	entrantB: EntrantInCurrentSet;
+	stage: Stage | null;
 }
 
-// TODO this is a mess
-// slippi data only applies to current set
-interface UpcomingSet {
-	id: number;
+export interface EntrantInUpcomingSet {
+	player1: PlayerInUpcomingSet;
+	player2: PlayerInUpcomingSet | null;
+}
+
+export interface UpcomingSet {
+	startggSetId: number;
 	state: typeof SetState.infer;
 	phaseGroupDisplayIdentifier: string | null;
-	leftEntrant: {
-		name: string;
-		pronouns: string;
-	};
+	entrantA: EntrantInUpcomingSet;
+	entrantB: EntrantInUpcomingSet;
 }
 
-interface Station {
-	id: number;
-	mode: "basic-text-override" | "players-override" | "startgg";
-	basicText: string;
-	playersOverride: Players;
-	upcomingSets: StartggAndSlippiSet[];
-	ports: (number | null)[];
+/** startgg player id or null (no player) */
+export const Port = type("number|null");
+
+export const Ports = type([Port, Port, Port, Port]);
+
+export const Mode = type("'basic-text-override'|'players-override'|'startgg'");
+
+export interface Station {
+	bestOf: number;
+	startggStationNumber: number;
+	mode: typeof Mode.infer;
+	basicTextOverride: string;
+	playersOverride: PlayerInCurrentSet[];
+	currentSet: CurrentSet | null;
+	upcomingSets: UpcomingSet[];
+	ports: typeof Ports.infer;
+	// TODO implement
+	slippiStatus: unknown;
 }
 
-interface State {
+export interface State {
 	stations: Station[];
 	centerText: string;
 }
 
-let state: State = {
+export let state: State = {
 	stations: [],
 	centerText: "",
 };
 
-const emitter = new EventEmitter();
+export const emitter = new EventEmitter();
 
+/** @deprecated */
 export const updateState = (patchFn: (oldState: State) => State) => {
 	state = patchFn(state);
 	emitter.emit("data", state);
 };
 
-export const emitterIterator = on(emitter, "data") as AsyncIterator<State>;
+export const updateStateMut = (patchFn: (oldState: State) => void) => {
+	patchFn(state);
+	emitter.emit("data", state);
+};
+
+export const signalUpdate = () => {
+	emitter.emit("data", state);
+};

@@ -7,12 +7,12 @@ import {
 	DialogContentText,
 	DialogTitle,
 } from "@mui/material";
-import type { SetType } from "../../shared/startgg-schemas";
+import type { CurrentSet, EntrantInCurrentSet } from "../../backend/state";
 import { PortsDialog } from "./PortsDialog";
 import { ResetDialog } from "./ResetDialog";
 
 interface Props {
-	set: typeof SetType.infer;
+	currentSet: CurrentSet;
 	ports: (number | null)[];
 	hwDialogOpen: boolean;
 	setHwDialogOpen: (open: boolean) => void;
@@ -23,8 +23,13 @@ interface Props {
 	stationId: number;
 }
 
+const entrantName = (entrant: EntrantInCurrentSet) =>
+	entrant.player2
+		? `${entrant.player1.tag} / ${entrant.player2.tag}`
+		: entrant.player1.tag;
+
 export const StationDialogs = ({
-	set,
+	currentSet,
 	ports,
 	hwDialogOpen,
 	setHwDialogOpen,
@@ -36,14 +41,15 @@ export const StationDialogs = ({
 }: Props) => (
 	<>
 		<ResetDialog
-			set={set}
+			currentSet={currentSet}
 			open={resetDialogOpen}
 			onClose={() => setResetDialogOpen(false)}
-			stationId={stationId}
+			stationNumber={stationId}
 		/>
 		<Dialog open={hwDialogOpen} onClose={() => setHwDialogOpen(false)}>
 			<DialogTitle>
-				Starting set {set.slots[0].entrant.name} vs. {set.slots[1].entrant.name}
+				Starting set {entrantName(currentSet.entrantA)} vs.{" "}
+				{entrantName(currentSet.entrantB)}
 			</DialogTitle>
 			<DialogContent>
 				<DialogContentText color="black" fontWeight={900}>
@@ -63,11 +69,11 @@ export const StationDialogs = ({
 			</DialogActions>
 		</Dialog>
 		<PortsDialog
-			set={set}
+			currentSet={currentSet}
 			open={portDialogOpen}
 			setOpen={setPortDialogOpen}
 			ports={ports}
-			stationId={stationId}
+			stationNumber={stationId}
 		/>
 	</>
 );

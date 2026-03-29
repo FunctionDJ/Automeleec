@@ -1,25 +1,21 @@
 import { Close } from "@mui/icons-material";
 import { DialogContentText, Radio } from "@mui/material";
 import type { Dispatch } from "react";
-import type { Participant } from "../../shared/startgg-schemas";
+import type { PlayerInCurrentSet } from "../../backend/state";
 
 interface Props {
-	participant: typeof Participant.infer;
+	player: PlayerInCurrentSet;
 	portsInput: (number | null)[];
 	setPortsInput: Dispatch<(number | null)[]>;
 }
 
-export const PortInput = ({
-	participant,
-	portsInput,
-	setPortsInput,
-}: Props) => (
+export const PortInput = ({ player, portsInput, setPortsInput }: Props) => (
 	<div className="border-b-4 py-2 border-gray-300 flex justify-center">
 		<div>
-			<DialogContentText>Port of {participant.gamerTag}</DialogContentText>
+			<DialogContentText>Port of {player.tag}</DialogContentText>
 			<div>
 				{[1, 2, 3, 4, null].map((radioValue) => {
-					const foundIndex = portsInput.indexOf(participant.id);
+					const foundIndex = portsInput.indexOf(player.startggParticipantId);
 
 					let checked = false;
 
@@ -43,7 +39,7 @@ export const PortInput = ({
 								}
 
 								if (radioValue !== null) {
-									newPorts[radioValue - 1] = participant.id;
+									newPorts[radioValue - 1] = player.startggParticipantId;
 								}
 
 								setPortsInput(newPorts);

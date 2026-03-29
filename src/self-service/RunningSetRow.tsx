@@ -1,24 +1,24 @@
 import { TableCell, TableRow, Typography } from "@mui/material";
-import type { Slot } from "../../shared/startgg-schemas";
+import type { EntrantInCurrentSet } from "../../backend/state";
 
 interface Props {
-	slot: typeof Slot.infer | undefined;
+	entrant: EntrantInCurrentSet | undefined;
 }
 
-export const RunningSetRow = ({ slot }: Props) => (
+export const RunningSetRow = ({ entrant }: Props) => (
 	<TableRow>
 		<TableCell align="right">
-			<Typography>{slot?.standing.stats.score.value}</Typography>
+			<Typography>{entrant?.score}</Typography>
 		</TableCell>
 		<TableCell></TableCell>
 		<TableCell>
 			<div style={{ width: 200 }}>
-				<Typography noWrap>{slot?.entrant.name}</Typography>
+				<Typography noWrap>{entrant?.player1.tag}</Typography>
 			</div>
-			{slot?.entrant.team !== null && (
+			{entrant?.player2 && (
 				<div style={{ width: 200 }}>
 					<Typography fontSize={18} color="grey" noWrap>
-						{slot?.entrant.participants.map((p) => p.gamerTag).join(", ")}
+						{entrant.player2.tag}
 					</Typography>
 				</div>
 			)}

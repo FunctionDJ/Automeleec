@@ -19,6 +19,7 @@ export const Slot = type({
 		},
 	},
 	entrant: {
+		id: "number",
 		name: "string",
 		team: type({
 			id: "number",

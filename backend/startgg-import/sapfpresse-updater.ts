@@ -1,8 +1,9 @@
 import { type } from "arktype";
-import { Event } from "../shared/startgg-schemas";
-import { updateState } from "./state";
+import { Event } from "../../shared/startgg-schemas";
+import { updateStateMut } from "../state";
+import { getNewStationByEvents } from "./startgg-transformers";
 
-const querySchemaArk = type({
+const Response = type({
 	data: {
 		tournament: {
 			events: Event.array(),
@@ -39,6 +40,7 @@ query SetsAtStations {
               }
             }
             entrant {
+              id
               name
               team {
                 id
@@ -72,7 +74,7 @@ const fetchStartGGAndUpdateState = async () => {
 	});
 
 	const data = await response.json();
-	const out = querySchemaArk(data);
+	const out = Response(data);
 
 	if (out instanceof type.errors) {
 		// TODO better error handling
@@ -80,19 +82,11 @@ const fetchStartGGAndUpdateState = async () => {
 		throw new Error(out.summary);
 	}
 
-	updateState((oldState) => ({
-		...oldState,
-		stations: oldState.stations.map((station) => {
-			return {
-				...station,
-				playersStartgg: out.data.tournament.events.flatMap((event) =>
-					event.sets.nodes.filter(
-						(set) => set.station?.number === station.number,
-					),
-				),
-			};
-		}),
-	}));
+	updateStateMut((state) => {
+		state.stations = state.stations.map((oldStation) =>
+			getNewStationByEvents(oldStation, out.data.tournament.events),
+		);
+	});
 };
 
 setInterval(() => {

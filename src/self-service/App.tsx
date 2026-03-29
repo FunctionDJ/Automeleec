@@ -1,110 +1,39 @@
 import { CircularProgress, DialogContentText } from "@mui/material";
-import { useQuery } from "@tanstack/react-query";
-import { type as arkType, type } from "arktype";
-import { Event } from "../../shared/startgg-schemas";
-import { Station } from "./Station";
-
-const querySchemaArk = arkType({
-	data: {
-		tournament: {
-			events: Event.array(),
-		},
-	},
-});
-
-const gql = `
-query SetsAtStations {
-  tournament(slug: "sapf2-test") {
-    events {
-      sets(filters: {stationNumbers: [1,2,3,4]}) {
-        nodes {
-          id
-          phaseGroup {
-            displayIdentifier
-          }
-          state
-          startedAt
-          station {
-            number
-          }
-          slots {
-            slotIndex
-            standing {
-              totalPoints
-              placement
-              stats {
-                score {
-                  label
-                  value
-                  displayValue
-                }
-              }
-            }
-            entrant {
-              name
-              team {
-                id
-                name
-              }
-              participants {
-                id
-                gamerTag
-                prefix
-                user {
-                  genderPronoun
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}`;
+import { useEffect, useState } from "react";
+import type { State } from "../../backend/state";
+import { trpc } from "../trpc-client";
+import { StationComponent } from "./Station";
 
 export function App() {
-	const stationQuery = useQuery({
-		queryKey: ["stations"],
-		refetchInterval: 5000,
-		retry: false,
-		queryFn: async () =>
-			fetch("https://api.start.gg/gql/alpha", {
-				method: "POST",
-				body: JSON.stringify({
-					query: gql,
-				}),
-				headers: {
-					Authorization: `Bearer ${import.meta.env.VITE_STARTGG_API_KEY}`,
-				},
-			})
-				.then((r) => r.json())
-				.then((data) => {
-					const out = querySchemaArk(data);
+	const [state, setState] = useState<State | null>(null);
+	const [error, setError] = useState<Error | null>(null);
 
-					if (out instanceof type.errors) {
-						throw new Error(out.summary);
-					}
+	useEffect(() => {
+		const sub = trpc.stateSubscription.subscribe(undefined, {
+			onData: setState,
+			onError: (err) =>
+				setError(err instanceof Error ? err : new Error(String(err))),
+		});
 
-					return out;
-				}),
-	});
+		return () => sub.unsubscribe();
+	}, []);
 
-	if (stationQuery.isLoading) {
+	if (error) {
 		return (
-			<div className="h-dvh grid place-content-center">
-				<div className="flex gap-4 items-center">
-					<CircularProgress />
-					<DialogContentText>Loading start.gg data...</DialogContentText>
-				</div>
+			<div>
+				<p>error</p>
+				<pre>{error.message}</pre>
 			</div>
 		);
 	}
 
-	if (!stationQuery.isSuccess) {
+	if (!state) {
 		return (
-			<div>
-				<p>{stationQuery.status}</p>
-				<pre>{String(stationQuery.error)}</pre>
+			<div className="h-dvh grid place-content-center">
+				<div className="flex gap-4 items-center">
+					<CircularProgress />
+					<DialogContentText>Loading...</DialogContentText>
+				</div>
 			</div>
 		);
 	}
@@ -115,13 +44,10 @@ export function App() {
 				Side-Stream Self-Service
 			</span>
 			<div className="flex gap-4 grow overflow-scroll p-4">
-				{[1, 2, 3, 4].map((id) => (
-					<Station
-						key={id}
-						id={id}
-						sets={stationQuery.data.data.tournament.events.flatMap((e) =>
-							e.sets.nodes.filter((set) => set.station.number === id),
-						)}
+				{state.stations.map((station) => (
+					<StationComponent
+						key={station.startggStationNumber}
+						station={station}
 					/>
 				))}
 			</div>

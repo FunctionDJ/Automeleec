@@ -6,29 +6,35 @@ import {
 	DialogContent,
 	DialogTitle,
 } from "@mui/material";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useState, type Dispatch } from "react";
-import type { SetType } from "../../shared/startgg-schemas";
+import type { CurrentSet, EntrantInCurrentSet } from "../../backend/state";
 import { trpc } from "../trpc-client";
 import { PortInput } from "./PortInput";
 
 interface Props {
-	set: typeof SetType.infer;
+	currentSet: CurrentSet;
 	open: boolean;
 	setOpen: Dispatch<boolean>;
 	ports: (number | null)[];
-	stationId: number;
+	stationNumber: number;
 }
 
+const entrantName = (entrant: EntrantInCurrentSet) =>
+	entrant.player2
+		? `${entrant.player1.tag} / ${entrant.player2.tag}`
+		: entrant.player1.tag;
+
 export const PortsDialog = ({
-	set,
+	currentSet,
 	open,
 	setOpen,
 	ports,
-	stationId,
+	stationNumber,
 }: Props) => {
-	const participants = set.slots.flatMap((slot) => slot.entrant.participants);
-	const queryClient = useQueryClient();
+	const players = [currentSet.entrantA, currentSet.entrantB].flatMap((e) =>
+		e.player2 ? [e.player1, e.player2] : [e.player1],
+	);
 	const [portsInput, setPortsInput] = useState(ports);
 
 	// TODO port resetting is not working properly
@@ -44,46 +50,42 @@ export const PortsDialog = ({
 
 	const startSetMutation = useMutation({
 		mutationFn: () =>
-			fetch("https://api.start.gg/gql/alpha", {
-				method: "POST",
-				headers: {
-					Authorization: `Bearer ${import.meta.env.VITE_STARTGG_API_KEY}`,
-				},
-				body: JSON.stringify({
-					query: `
-						mutation startset {
-							markSetInProgress(setId: ${set.id}) {
-								id
-							}
-						}
-					`,
-				}),
+			trpc.selfService.markSetInProgress.mutate({
+				setId: currentSet.startggSetId,
 			}),
-		onSuccess: () => queryClient.invalidateQueries({ queryKey: ["stations"] }),
 	});
 
 	const updatePortsMutation = useMutation({
-		mutationFn: () => trpc.updatePorts.mutate({ stationId, ports: portsInput }),
-		onSuccess: () => queryClient.invalidateQueries({ queryKey: ["ports"] }),
+		mutationFn: () =>
+			trpc.selfService.updatePorts.mutate({
+				stationNumber,
+				ports: portsInput as [
+					number | null,
+					number | null,
+					number | null,
+					number | null,
+				],
+			}),
 	});
 
 	return (
 		<Dialog open={open} onClose={onClose}>
 			<DialogTitle>
-				{set.state !== "active" ? "Starting set " : "Updating ports for "}
-				{set.slots[0].entrant.name} vs. {set.slots[1].entrant.name}
+				{currentSet.state !== "active"
+					? "Starting set "
+					: "Updating ports for "}
+				{entrantName(currentSet.entrantA)} vs.{" "}
+				{entrantName(currentSet.entrantB)}
 			</DialogTitle>
 			<DialogContent>
-				{set.slots
-					.flatMap((slot) => slot.entrant.participants)
-					.map((participant) => (
-						<PortInput
-							participant={participant}
-							portsInput={portsInput}
-							setPortsInput={setPortsInput}
-							key={participant.id}
-						/>
-					))}
+				{players.map((player) => (
+					<PortInput
+						player={player}
+						portsInput={portsInput}
+						setPortsInput={setPortsInput}
+						key={player.startggParticipantId}
+					/>
+				))}
 			</DialogContent>
 			<DialogActions>
 				<Button
@@ -91,7 +93,7 @@ export const PortsDialog = ({
 					onClick={() => {
 						updatePortsMutation.mutate(undefined, {
 							onSuccess: () => {
-								if (set.state !== "active") {
+								if (currentSet.state !== "active") {
 									startSetMutation.mutate(undefined, {
 										onSuccess: () => onClose(),
 									});
@@ -102,13 +104,12 @@ export const PortsDialog = ({
 						});
 					}}
 					disabled={
-						participants.length !==
-						portsInput.filter((port) => port !== null).length
+						players.length !== portsInput.filter((port) => port !== null).length
 					}
 					startIcon={<Sync />}
 					color="success"
 				>
-					{set.state === "active" ? "update ports" : "START SET"}
+					{currentSet.state === "active" ? "update ports" : "START SET"}
 				</Button>
 			</DialogActions>
 		</Dialog>

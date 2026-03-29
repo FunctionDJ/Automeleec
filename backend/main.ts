@@ -5,10 +5,12 @@ import { appRouter } from "./router";
 
 const PORT =
 	process.env.PORT !== undefined ? Number.parseInt(process.env.PORT, 10) : 3000;
+
 const isDev = process.env.NODE_ENV !== "production";
 
 const trpcHandler = createHTTPHandler({
 	router: appRouter,
+	basePath: "/trpc/",
 });
 
 const vite: ViteDevServer = await createViteServer({
@@ -18,8 +20,6 @@ const vite: ViteDevServer = await createViteServer({
 
 const server = createServer((req, res) => {
 	if (req.url !== undefined && req.url.startsWith("/trpc/")) {
-		// Rewrite URL: /trpc/hello?params -> /hello?params
-		req.url = req.url.substring(5);
 		return trpcHandler(req, res);
 	}
 

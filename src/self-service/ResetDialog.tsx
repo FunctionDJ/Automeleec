@@ -7,54 +7,40 @@ import {
 	DialogContentText,
 	DialogTitle,
 } from "@mui/material";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { SetType } from "../../shared/startgg-schemas";
+import { useMutation } from "@tanstack/react-query";
+import type { CurrentSet, EntrantInCurrentSet } from "../../backend/state";
 import { trpc } from "../trpc-client";
 
 interface Props {
-	set: typeof SetType.infer;
+	currentSet: CurrentSet;
 	open: boolean;
 	onClose: () => void;
-	stationId: number;
+	stationNumber: number;
 }
 
-export const ResetDialog = ({ set, open, onClose, stationId }: Props) => {
-	const queryClient = useQueryClient();
+const entrantName = (entrant: EntrantInCurrentSet) =>
+	entrant.player2
+		? `${entrant.player1.tag} / ${entrant.player2.tag}`
+		: entrant.player1.tag;
 
+export const ResetDialog = ({
+	currentSet,
+	open,
+	onClose,
+	stationNumber,
+}: Props) => {
 	const resetSetMutation = useMutation({
-		mutationFn: async () => {
-			await fetch("https://api.start.gg/gql/alpha", {
-				method: "POST",
-				headers: {
-					Authorization: `Bearer ${import.meta.env.VITE_STARTGG_API_KEY}`,
-				},
-				body: JSON.stringify({
-					query: `
-						mutation resetset {
-							resetSet(setId: ${set.id}) {
-								id
-							}
-						}
-					`,
-				}),
-			});
-
-			await trpc.updatePorts.mutate({
-				stationId,
-				ports: [null, null, null, null],
-			});
-		},
-		onSuccess: async () => {
-			await queryClient.invalidateQueries({ queryKey: ["ports"] });
-			await queryClient.invalidateQueries({ queryKey: ["stations"] });
-		},
+		mutationFn: () =>
+			trpc.selfService.resetSet.mutate({
+				stationNumber,
+			}),
 	});
 
 	return (
 		<Dialog open={open} onClose={onClose}>
 			<DialogTitle>
-				Resetting set {set.slots[0].entrant.name} vs.{" "}
-				{set.slots[1].entrant.name}
+				Resetting set {entrantName(currentSet.entrantA)} vs.{" "}
+				{entrantName(currentSet.entrantB)}
 			</DialogTitle>
 			<DialogContent>
 				<DialogContentText>

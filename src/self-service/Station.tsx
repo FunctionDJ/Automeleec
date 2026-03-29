@@ -19,18 +19,15 @@ import {
 	Typography,
 } from "@mui/material";
 import { green, purple } from "@mui/material/colors";
-import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import type { SetType } from "../../shared/startgg-schemas";
-import { trpc } from "../trpc-client";
+import type { Station } from "../../backend/state";
 import { mainThemeConfig } from "./mainTheme";
 import { RunningSetRow } from "./RunningSetRow";
 import { StationDialogs } from "./StationDialogs";
 import { Timer } from "./Timer";
 
 interface Props {
-	id: number;
-	sets: (typeof SetType.infer)[];
+	station: Station;
 }
 
 // TODO slippi connection status with icon etc
@@ -45,61 +42,49 @@ const stationTheme = createTheme({
 	},
 });
 
-export const Station = ({ id, sets }: Props) => {
+export const StationComponent = ({ station }: Props) => {
 	const [hwDialogOpen, setHwDialogOpen] = useState(false);
 	const [portDialogOpen, setPortDialogOpen] = useState(false);
 	const [resetDialogOpen, setResetDialogOpen] = useState(false);
-	const firstSet = sets.at(0);
-
-	const portsQuery = useQuery({
-		queryKey: ["ports"],
-		refetchInterval: 5000,
-		queryFn: async () => trpc.getAllPorts.query(),
-		structuralSharing: (oldData, newData) => {
-			if (JSON.stringify(oldData) === JSON.stringify(newData)) {
-				return oldData;
-			}
-			return newData;
-		},
-	});
+	const { currentSet } = station;
 
 	return (
 		<div>
-			{firstSet !== undefined && portsQuery.isSuccess && (
+			{currentSet !== null && (
 				<StationDialogs
-					set={firstSet}
-					ports={portsQuery.data[id] ?? [null, null, null, null]}
+					currentSet={currentSet}
+					ports={station.ports}
 					hwDialogOpen={hwDialogOpen}
 					setHwDialogOpen={setHwDialogOpen}
 					portDialogOpen={portDialogOpen}
 					setPortDialogOpen={setPortDialogOpen}
 					resetDialogOpen={resetDialogOpen}
 					setResetDialogOpen={setResetDialogOpen}
-					stationId={id}
+					stationId={station.startggStationNumber}
 				/>
 			)}
 			<ThemeProvider theme={stationTheme}>
 				<Card sx={{ bgcolor: "grey.900" }}>
 					<CardContent
 						sx={{
-							bgcolor: firstSet
-								? firstSet.state === "active"
+							bgcolor: currentSet
+								? currentSet.state === "active"
 									? purple[800]
 									: green[600]
 								: undefined,
 						}}
 					>
-						<Typography>Station {id}</Typography>
+						<Typography>Station {station.startggStationNumber}</Typography>
 						<div>
-							{firstSet ? (
-								firstSet.state === "active" ? (
+							{currentSet ? (
+								currentSet.state === "active" ? (
 									<div className="flex justify-between">
 										<Typography>
 											<HourglassBottom /> Set in progress
 										</Typography>
 										<Typography>
-											{firstSet.startedAt && (
-												<Timer startDate={firstSet.startedAt} />
+											{currentSet.startedAt && (
+												<Timer startDate={new Date(currentSet.startedAt)} />
 											)}
 										</Typography>
 									</div>
@@ -121,11 +106,11 @@ export const Station = ({ id, sets }: Props) => {
 								<TableRow>
 									<TableCell colSpan={3} align="center">
 										<Typography>
-											Pool {firstSet?.phaseGroup.displayIdentifier ?? "-"}
+											Pool {currentSet?.phaseGroupDisplayIdentifier ?? "-"}
 										</Typography>
 									</TableCell>
 								</TableRow>
-								<RunningSetRow slot={firstSet?.slots[0]} />
+								<RunningSetRow entrant={currentSet?.entrantA} />
 								<TableRow>
 									<TableCell
 										colSpan={3}
@@ -135,13 +120,13 @@ export const Station = ({ id, sets }: Props) => {
 										<Typography>vs</Typography>
 									</TableCell>
 								</TableRow>
-								<RunningSetRow slot={firstSet?.slots[1]} />
+								<RunningSetRow entrant={currentSet?.entrantB} />
 							</TableBody>
 						</Table>
 					</CardContent>
-					{firstSet !== undefined && (
+					{currentSet !== null && (
 						<CardContent className="flex flex-col gap-4">
-							{firstSet.state !== "active" && (
+							{currentSet.state !== "active" && (
 								<Button
 									onClick={() => {
 										setHwDialogOpen(true);
@@ -151,7 +136,7 @@ export const Station = ({ id, sets }: Props) => {
 									TOUCH TO START
 								</Button>
 							)}
-							{firstSet.state === "active" && (
+							{currentSet.state === "active" && (
 								<>
 									<Button
 										color="secondary"

@@ -3,8 +3,7 @@
 	"type": "module",
 	"scripts": {
 		"dev": "tsx watch --env-file=.env backend/main.ts",
-		"start": "NODE_ENV=production tsx --env-file=.env backend/main.ts",
-		"lint": "tsc --build && biome lint"
+		"start": "NODE_ENV=production tsx --env-file=.env backend/main.ts"
 	},
 	"dependencies": {
 		"@emotion/react": "^11.14.0",
@@ -27,6 +26,7 @@
 		"eslint-plugin-react-hooks": "^7.0.1",
 		"react": "^19.2.4",
 		"react-dom": "^19.2.4",
+		"superjson": "^2.2.6",
 		"tailwind-merge": "^3.4.1",
 		"tailwindcss": "^4.1.18",
 		"tsx": "^4.21.0",

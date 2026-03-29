@@ -11,16 +11,18 @@
 - nach set ende das gerade abgeschlossene set noch 1-2 minuten anzeigen aber mit "next set" button
 - "call set" funktion mit timer wie lange der call schon dauert und evtl DQ button
 
-## slippi schnittstelle
+WIP prompt:
+add a dashboard in a "dashboard" folder in #file:src . look at the notes in #file:notes.md to see additional requirements, but basically the dashboard is meant for streamers and tournament organizers and should have full overview and control over the system, meaning it should display everything in state (see #file:state.ts ).
+some more context: if you happen to look at #file:self-service, you should know that it currently talks directly to start.gg itself, which
 
-- live characters + costumes auslesen und per tRPC an stream-layout exposen
+## slippi schnittstelle
 
 - wenn pause-quit und 3min vergangen dann checken ob jemand last-stock war. wenn ja, set zählen (je nach stocks, %)
 
 ## alle
 
 - meine credits (waffeln) mit "go play Project+!" klein und in die ecke packen, aber maybe nicht on-stream
-- **(außer stream-layout) timer wenn ein set gecalled wrd**
+- **(außer stream-layout) timer wenn ein set gecalled wird**
 
 ## stream-layout
 
@@ -39,3 +41,14 @@ https://github.com/jmlee337/replay-manager-for-slippi
 https://github.com/jmlee337/discord-tournament-bot
 
 https://github.com/SSBDoppler/slippi-hud
+
+https://github.com/Readek/Melee-Stream-Tool
+
+- rename to sapfladen???
+
+- das system soll in der lage sein, es zu verkraften, wenn ein set per self-service erst nach dem start eines matches gestartet wurde, also dass per slippi trotzdem immer die aktuellen characters und die stage gespeichert werden, falls erst danach ein match gestartet und dann character/stage für mindestens das overlay, aber im optimalfall für startgg vorhanden sind
+
+- backend mit bun testen und wenn es keine probleme wegen bun gibt dann darauf committen und dann
+  - package management umstellen wenn da noch was zu tun ist
+  - package.json scripts umstellen und tsx entfernen
+  - backend server auf bun apis umstellen und auch sonstige node APIs im projekt

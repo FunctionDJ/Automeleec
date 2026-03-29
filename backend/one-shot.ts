@@ -1,6 +1,6 @@
 import type { GameEndType, GameStartType } from "@slippi/slippi-js/node";
 import fs from "node:fs/promises";
-import { reportBracketSetBySlippiData } from "./report-bracket-set-by-slippi-data";
+import { reportBracketSetBySlippiData } from "./startgg-export/report-bracket-set-by-slippi-data";
 import { portsStorage } from "./router";
 
 const dataString = await fs.readFile("./abba.json", "utf-8");
