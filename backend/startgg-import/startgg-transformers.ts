@@ -11,7 +11,7 @@ import type {
 
 const participantToPlayerInCurrentSet = (
 	participant: typeof Participant.infer,
-): PlayerInCurrentSet => ({
+): typeof PlayerInCurrentSet.infer => ({
 	startggParticipantId: participant.id,
 	tag: participant.gamerTag,
 	pronouns: participant.user?.genderPronoun ?? "",
@@ -21,7 +21,7 @@ const participantToPlayerInCurrentSet = (
 
 const slotToCurrentSetEntrant = (
 	slot: typeof Slot.infer,
-): EntrantInCurrentSet => ({
+): typeof EntrantInCurrentSet.infer => ({
 	startggEntrantId: slot.entrant.id,
 	score: slot.standing.stats.score.value ?? null,
 	player1: slot.entrant.participants[0]

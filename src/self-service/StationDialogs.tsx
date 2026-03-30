@@ -23,7 +23,7 @@ interface Props {
 	stationId: number;
 }
 
-const entrantName = (entrant: EntrantInCurrentSet) =>
+const entrantName = (entrant: typeof EntrantInCurrentSet.infer) =>
 	entrant.player2
 		? `${entrant.player1.tag} / ${entrant.player2.tag}`
 		: entrant.player1.tag;

@@ -2,7 +2,7 @@ import { TableCell, TableRow, Typography } from "@mui/material";
 import type { EntrantInCurrentSet } from "../../backend/state";
 
 interface Props {
-	entrant: EntrantInCurrentSet | undefined;
+	entrant: typeof EntrantInCurrentSet.infer | undefined;
 }
 
 export const RunningSetRow = ({ entrant }: Props) => (

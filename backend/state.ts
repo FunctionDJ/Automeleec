@@ -11,27 +11,25 @@ export const PlayerInCurrentSet = type({
 	characterColor: type("number|null"),
 });
 
-export type PlayerInCurrentSet = typeof PlayerInCurrentSet.infer;
-
 export interface PlayerInUpcomingSet {
 	tag: string;
 	pronouns: string;
 }
 
-export interface EntrantInCurrentSet {
-	startggEntrantId: number;
-	player1: PlayerInCurrentSet;
-	player2: PlayerInCurrentSet | null;
-	score: number | null;
-}
+export const EntrantInCurrentSet = type({
+	startggEntrantId: "number",
+	player1: PlayerInCurrentSet,
+	player2: type(PlayerInCurrentSet.or("null")),
+	score: type("number|null"),
+});
 
 export interface CurrentSet {
 	startggSetId: number;
 	state: typeof SetState.infer;
 	phaseGroupDisplayIdentifier: string | null;
 	startedAt: Date | null;
-	entrantA: EntrantInCurrentSet;
-	entrantB: EntrantInCurrentSet;
+	entrantA: typeof EntrantInCurrentSet.infer;
+	entrantB: typeof EntrantInCurrentSet.infer;
 	stage: Stage | null;
 }
 
@@ -53,14 +51,16 @@ const Port = type("number|null");
 
 export const Ports = type([Port, Port, Port, Port]);
 
-export const Mode = type("'basic-text-override'|'players-override'|'startgg'");
+export const Mode = type("'basic-text-override'|'entrant-override'|'startgg'");
 
 export interface Station {
 	bestOf: number;
 	startggStationNumber: number;
 	mode: typeof Mode.infer;
 	basicTextOverride: string;
-	playersOverride: PlayerInCurrentSet[];
+	entrantOverride:
+		| [typeof EntrantInCurrentSet.infer, typeof EntrantInCurrentSet.infer]
+		| null;
 	currentSet: CurrentSet | null;
 	upcomingSets: UpcomingSet[];
 	ports: typeof Ports.infer;
@@ -76,7 +76,17 @@ export interface State {
 // TODO state speichern? was wenn prozess crasht? was ist mit den ports, overrides etc?
 
 export const state: State = {
-	stations: [],
+	stations: [1, 2, 3, 4].map((stationNumber) => ({
+		bestOf: 5,
+		startggStationNumber: stationNumber,
+		mode: "startgg",
+		basicTextOverride: "",
+		entrantOverride: null,
+		currentSet: null,
+		upcomingSets: [],
+		ports: [null, null, null, null],
+		slippiStatus: null,
+	})),
 	centerText: "",
 };
 

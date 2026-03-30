@@ -2,7 +2,7 @@ import type { GameStartType } from "@slippi/slippi-js/node";
 import type { PlayerInCurrentSet, Ports } from "../state";
 
 export const findPlayerInSlippiSettings = (
-	player: PlayerInCurrentSet,
+	player: typeof PlayerInCurrentSet.infer,
 	settings: GameStartType,
 	ports: typeof Ports.infer,
 ) => {

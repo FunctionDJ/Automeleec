@@ -2,7 +2,7 @@ import type { PlayerType } from "@slippi/slippi-js/node";
 import type { PlayerInCurrentSet } from "../state";
 
 export const applyPlayerTypeToState = (
-	playerInCurrentSet: PlayerInCurrentSet,
+	playerInCurrentSet: typeof PlayerInCurrentSet.infer,
 	playerType: PlayerType,
 ) => {
 	playerInCurrentSet.character = playerType.characterId ?? null;

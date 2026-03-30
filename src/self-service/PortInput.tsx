@@ -4,7 +4,7 @@ import type { Dispatch } from "react";
 import type { PlayerInCurrentSet } from "../../backend/state";
 
 interface Props {
-	player: PlayerInCurrentSet;
+	player: typeof PlayerInCurrentSet.infer;
 	portsInput: (number | null)[];
 	setPortsInput: Dispatch<(number | null)[]>;
 }

@@ -1,6 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { type } from "arktype";
-import { Mode, PlayerInCurrentSet, state } from "../state";
+import { EntrantInCurrentSet, Mode, signalUpdate, state } from "../state";
 import { publicProcedure, router } from "../trpc-server";
 
 export const stationProcedure = publicProcedure
@@ -22,18 +22,23 @@ export const stationProcedure = publicProcedure
 
 export const dashboardRouter = router({
 	setPlayerOverride: stationProcedure
-		.input(type({ playersOverride: PlayerInCurrentSet.array() }))
+		.input(
+			type({ entrantOverride: [EntrantInCurrentSet, EntrantInCurrentSet] }),
+		)
 		.mutation(({ input, ctx }) => {
-			ctx.station.playersOverride = input.playersOverride;
+			ctx.station.entrantOverride = input.entrantOverride;
+			signalUpdate();
 		}),
 	setBasicTextOverride: stationProcedure
 		.input(type({ basicTextOverride: "string" }))
 		.mutation(({ input, ctx }) => {
 			ctx.station.basicTextOverride = input.basicTextOverride;
+			signalUpdate();
 		}),
 	setMode: stationProcedure
 		.input(type({ mode: Mode }))
 		.mutation(({ input, ctx }) => {
 			ctx.station.mode = input.mode;
+			signalUpdate();
 		}),
 });
