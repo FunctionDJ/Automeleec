@@ -7,13 +7,14 @@ import {
 	DialogContentText,
 	DialogTitle,
 } from "@mui/material";
-import type { CurrentSet, EntrantInCurrentSet } from "../../backend/state";
+import type { CurrentSet, Ports } from "../../backend/state";
+import { entrantLabel } from "../../shared/entrant-utils";
 import { PortsDialog } from "./PortsDialog";
 import { ResetDialog } from "./ResetDialog";
 
 interface Props {
-	currentSet: CurrentSet;
-	ports: (number | null)[];
+	currentSet: typeof CurrentSet.infer;
+	ports: typeof Ports.infer;
 	hwDialogOpen: boolean;
 	setHwDialogOpen: (open: boolean) => void;
 	portDialogOpen: boolean;
@@ -22,11 +23,6 @@ interface Props {
 	setResetDialogOpen: (open: boolean) => void;
 	stationId: number;
 }
-
-const entrantName = (entrant: typeof EntrantInCurrentSet.infer) =>
-	entrant.player2
-		? `${entrant.player1.tag} / ${entrant.player2.tag}`
-		: entrant.player1.tag;
 
 export const StationDialogs = ({
 	currentSet,
@@ -48,8 +44,8 @@ export const StationDialogs = ({
 		/>
 		<Dialog open={hwDialogOpen} onClose={() => setHwDialogOpen(false)}>
 			<DialogTitle>
-				Starting set {entrantName(currentSet.entrantA)} vs.{" "}
-				{entrantName(currentSet.entrantB)}
+				Starting set {entrantLabel(currentSet.entrantA)} vs.{" "}
+				{entrantLabel(currentSet.entrantB)}
 			</DialogTitle>
 			<DialogContent>
 				<DialogContentText color="black" fontWeight={900}>

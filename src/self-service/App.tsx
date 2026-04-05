@@ -1,33 +1,23 @@
 import { CircularProgress, DialogContentText } from "@mui/material";
-import { useEffect, useState } from "react";
-import type { State } from "../../backend/state";
+import { useSubscription } from "@trpc/tanstack-react-query";
 import { trpc } from "../trpc-client";
 import { StationComponent } from "./Station";
 
 export function App() {
-	const [state, setState] = useState<State | null>(null);
-	const [error, setError] = useState<Error | null>(null);
+	const subscription = useSubscription(
+		trpc.stateSubscription.subscriptionOptions(),
+	);
 
-	useEffect(() => {
-		const sub = trpc.stateSubscription.subscribe(undefined, {
-			onData: setState,
-			onError: (err) =>
-				setError(err instanceof Error ? err : new Error(String(err))),
-		});
-
-		return () => sub.unsubscribe();
-	}, []);
-
-	if (error) {
+	if (subscription.error) {
 		return (
 			<div>
 				<p>error</p>
-				<pre>{error.message}</pre>
+				<pre>{subscription.error.message}</pre>
 			</div>
 		);
 	}
 
-	if (!state) {
+	if (subscription.data === undefined) {
 		return (
 			<div className="h-dvh grid place-content-center">
 				<div className="flex gap-4 items-center">
@@ -44,7 +34,7 @@ export function App() {
 				Side-Stream Self-Service
 			</span>
 			<div className="flex gap-4 grow overflow-scroll p-4">
-				{state.stations.map((station) => (
+				{subscription.data.stations.map((station) => (
 					<StationComponent
 						key={station.startggStationNumber}
 						station={station}

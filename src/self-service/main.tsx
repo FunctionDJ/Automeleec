@@ -1,4 +1,4 @@
-import { commonMain } from "../common-main.tsx";
+import { commonMainWithTrpcErrors } from "../common-main-with-trpc-errors.tsx";
 import { App } from "./App.tsx";
 
-commonMain(App);
+commonMainWithTrpcErrors(App);

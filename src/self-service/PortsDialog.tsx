@@ -8,22 +8,21 @@ import {
 } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import { useState, type Dispatch } from "react";
-import type { CurrentSet, EntrantInCurrentSet } from "../../backend/state";
-import { trpc } from "../trpc-client";
+import type { CurrentSet, Ports } from "../../backend/state";
+import {
+	entrantLabel,
+	getPlayersFromCurrentSet,
+} from "../../shared/entrant-utils";
+import { trpcVanilla } from "../trpc-client";
 import { PortInput } from "./PortInput";
 
 interface Props {
-	currentSet: CurrentSet;
+	currentSet: typeof CurrentSet.infer;
 	open: boolean;
 	setOpen: Dispatch<boolean>;
-	ports: (number | null)[];
+	ports: typeof Ports.infer;
 	stationNumber: number;
 }
-
-const entrantName = (entrant: typeof EntrantInCurrentSet.infer) =>
-	entrant.player2
-		? `${entrant.player1.tag} / ${entrant.player2.tag}`
-		: entrant.player1.tag;
 
 export const PortsDialog = ({
 	currentSet,
@@ -32,9 +31,7 @@ export const PortsDialog = ({
 	ports,
 	stationNumber,
 }: Props) => {
-	const players = [currentSet.entrantA, currentSet.entrantB].flatMap((e) =>
-		e.player2 ? [e.player1, e.player2] : [e.player1],
-	);
+	const players = getPlayersFromCurrentSet(currentSet);
 	const [portsInput, setPortsInput] = useState(ports);
 
 	// TODO port resetting is not working properly
@@ -50,21 +47,16 @@ export const PortsDialog = ({
 
 	const startSetMutation = useMutation({
 		mutationFn: () =>
-			trpc.selfService.markSetInProgress.mutate({
+			trpcVanilla.selfService.markSetInProgress.mutate({
 				setId: currentSet.startggSetId,
 			}),
 	});
 
 	const updatePortsMutation = useMutation({
 		mutationFn: () =>
-			trpc.selfService.updatePorts.mutate({
+			trpcVanilla.selfService.updatePorts.mutate({
 				stationNumber,
-				ports: portsInput as [
-					number | null,
-					number | null,
-					number | null,
-					number | null,
-				],
+				ports: portsInput,
 			}),
 	});
 
@@ -74,8 +66,8 @@ export const PortsDialog = ({
 				{currentSet.state !== "active"
 					? "Starting set "
 					: "Updating ports for "}
-				{entrantName(currentSet.entrantA)} vs.{" "}
-				{entrantName(currentSet.entrantB)}
+				{entrantLabel(currentSet.entrantA)} vs.{" "}
+				{entrantLabel(currentSet.entrantB)}
 			</DialogTitle>
 			<DialogContent>
 				{players.map((player) => (

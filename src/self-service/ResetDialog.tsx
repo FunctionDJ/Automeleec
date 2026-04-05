@@ -8,20 +8,16 @@ import {
 	DialogTitle,
 } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
-import type { CurrentSet, EntrantInCurrentSet } from "../../backend/state";
-import { trpc } from "../trpc-client";
+import type { CurrentSet } from "../../backend/state";
+import { entrantLabel } from "../../shared/entrant-utils";
+import { trpcVanilla } from "../trpc-client";
 
 interface Props {
-	currentSet: CurrentSet;
+	currentSet: typeof CurrentSet.infer;
 	open: boolean;
 	onClose: () => void;
 	stationNumber: number;
 }
-
-const entrantName = (entrant: typeof EntrantInCurrentSet.infer) =>
-	entrant.player2
-		? `${entrant.player1.tag} / ${entrant.player2.tag}`
-		: entrant.player1.tag;
 
 export const ResetDialog = ({
 	currentSet,
@@ -31,7 +27,7 @@ export const ResetDialog = ({
 }: Props) => {
 	const resetSetMutation = useMutation({
 		mutationFn: () =>
-			trpc.selfService.resetSet.mutate({
+			trpcVanilla.selfService.resetSet.mutate({
 				stationNumber,
 			}),
 	});
@@ -39,8 +35,8 @@ export const ResetDialog = ({
 	return (
 		<Dialog open={open} onClose={onClose}>
 			<DialogTitle>
-				Resetting set {entrantName(currentSet.entrantA)} vs.{" "}
-				{entrantName(currentSet.entrantB)}
+				Resetting set {entrantLabel(currentSet.entrantA)} vs.{" "}
+				{entrantLabel(currentSet.entrantB)}
 			</DialogTitle>
 			<DialogContent>
 				<DialogContentText>

@@ -18,6 +18,3 @@ export const mainThemeConfig = {
 		},
 	},
 } as const;
-
-// TODO remove this if nothing's missing
-// export const mainTheme = createTheme(mainThemeConfig);

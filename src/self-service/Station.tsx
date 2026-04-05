@@ -27,10 +27,8 @@ import { StationDialogs } from "./StationDialogs";
 import { Timer } from "./Timer";
 
 interface Props {
-	station: Station;
+	station: typeof Station.infer;
 }
-
-// TODO slippi connection status with icon etc
 
 const stationTheme = createTheme({
 	...mainThemeConfig,

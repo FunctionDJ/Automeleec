@@ -3,7 +3,12 @@ import { StrictMode, type JSX } from "react";
 import { createRoot } from "react-dom/client";
 import { queryClient } from "./trpc-client.ts";
 
-export const commonMain = (AppComponent: () => JSX.Element) => {
+// TODO i dont really like the "wrap" thing. maybe we can just render the TrpcErrorNotification in each App?
+
+export const commonMain = (
+	AppComponent: () => JSX.Element,
+	wrap?: (content: JSX.Element) => JSX.Element,
+) => {
 	const root = document.getElementById("root");
 
 	if (!root) {
@@ -11,11 +16,13 @@ export const commonMain = (AppComponent: () => JSX.Element) => {
 		return;
 	}
 
+	const content = (
+		<QueryClientProvider client={queryClient}>
+			<AppComponent />
+		</QueryClientProvider>
+	);
+
 	createRoot(root).render(
-		<StrictMode>
-			<QueryClientProvider client={queryClient}>
-				<AppComponent />
-			</QueryClientProvider>
-		</StrictMode>,
+		<StrictMode>{wrap ? wrap(content) : content}</StrictMode>,
 	);
 };

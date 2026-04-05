@@ -1,12 +1,12 @@
 import { Close } from "@mui/icons-material";
 import { DialogContentText, Radio } from "@mui/material";
 import type { Dispatch } from "react";
-import type { PlayerInCurrentSet } from "../../backend/state";
+import type { PlayerInCurrentSet, Ports } from "../../backend/state";
 
 interface Props {
 	player: typeof PlayerInCurrentSet.infer;
-	portsInput: (number | null)[];
-	setPortsInput: Dispatch<(number | null)[]>;
+	portsInput: typeof Ports.infer;
+	setPortsInput: Dispatch<typeof Ports.infer>;
 }
 
 export const PortInput = ({ player, portsInput, setPortsInput }: Props) => (
@@ -32,7 +32,7 @@ export const PortInput = ({ player, portsInput, setPortsInput }: Props) => (
 							checkedIcon={radioValue === null ? <Close /> : undefined}
 							icon={radioValue === null ? <Close /> : undefined}
 							onChange={() => {
-								const newPorts = [...portsInput];
+								const newPorts: typeof Ports.infer = [...portsInput];
 
 								if (foundIndex !== -1) {
 									newPorts[foundIndex] = null;
