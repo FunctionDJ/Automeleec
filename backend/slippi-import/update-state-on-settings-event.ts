@@ -1,5 +1,5 @@
 import type { GameStartType, PlayerType } from "@slippi/slippi-js/node";
-import { updateStateSync } from "../state";
+import { updateStationSync } from "../state";
 import { applyPlayerTypeToState } from "./apply-playertype";
 import { findPlayerInSlippiSettings } from "./find-player-in-slippi-settings";
 
@@ -8,17 +8,7 @@ export const updateStateOnSettingsEvent = (
 	settingsEvent: GameStartType,
 	stationNumber: number,
 ) => {
-	updateStateSync((state) => {
-		const station = state.stations.find(
-			(s) => s.startggStationNumber === stationNumber,
-		);
-
-		if (station === undefined) {
-			throw new Error(
-				`${logPrefix} Received SETTINGS event but station is not in state.`,
-			);
-		}
-
+	updateStationSync(stationNumber, (station) => {
 		const { currentSet } = station;
 
 		if (currentSet === null) {

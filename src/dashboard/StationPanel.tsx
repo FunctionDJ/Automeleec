@@ -108,7 +108,8 @@ export function StationPanel({ station }: { station: typeof Station.infer }) {
 
 				<Divider />
 
-				<PortsControl station={station} />
+				{/* this key re-renders and therefore resets inputs to current state when ports in global state are changed */}
+				<PortsControl key={JSON.stringify(station.ports)} station={station} />
 
 				<div className="flex gap-2">
 					{station.mode === "basic-text-override" && (

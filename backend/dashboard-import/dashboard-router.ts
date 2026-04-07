@@ -61,27 +61,25 @@ export const dashboardRouter = router({
 		);
 
 		const validatedData = type({
-			tournament: {
-				streamQueue: type({
-					id: "string",
-					stream: {
-						enabled: "boolean",
-						isOnline: "boolean",
-						shortName: "string",
-						streamName: "string",
-						streamSource: type.or(
-							"'TWITCH'",
-							"'HITBOX'",
-							"'STREAMME'",
-							"'MIXER'",
-							"'YOUTUBE'",
-						),
-					},
-				}).array(),
-			},
+			streamQueue: type({
+				id: "string",
+				stream: {
+					enabled: "boolean",
+					isOnline: "boolean",
+					shortName: "string",
+					streamName: "string",
+					streamSource: type.or(
+						"'TWITCH'",
+						"'HITBOX'",
+						"'STREAMME'",
+						"'MIXER'",
+						"'YOUTUBE'",
+					),
+				},
+			}).array(),
 		}).assert(response);
 
-		return validatedData.tournament.streamQueue;
+		return validatedData.streamQueue;
 	}),
 	setStartggStreamQueueIdToTrack: publicProcedure
 		.input(type({ startggStreamQueueIdToTrack: "string|null" }))

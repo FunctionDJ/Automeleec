@@ -1,12 +1,12 @@
 import type { GameEndType } from "@slippi/slippi-js/node";
+import { getPlayersFromCurrentSet } from "../../shared/entrant-utilities";
+import { getStationOrThrow } from "../state";
 import { fetchActiveSet } from "./fetch-active-set";
 import { reportBracketSet, type Selection } from "./report-bracket-set";
-import { globalState } from "../state";
 import {
 	slippiCharacterToStartGGCharacter,
 	slippiStageToStartGGStageId,
 } from "./slippi-to-startgg";
-import { getPlayersFromCurrentSet } from "../../shared/entrant-utilities";
 
 export const reportBracketSetBySlippiData = async ({
 	gameEnd,
@@ -36,14 +36,7 @@ export const reportBracketSetBySlippiData = async ({
 		return;
 	}
 
-	const station = globalState.stations.find(
-		(s) => s.startggStationNumber === stationNumber,
-	);
-
-	if (station === undefined) {
-		console.error(`${logPrefix} Station not found in state, skipping report`);
-		return;
-	}
+	const station = getStationOrThrow(stationNumber);
 
 	if (station.mode !== "startgg") {
 		console.warn(

@@ -156,7 +156,7 @@ export const getStationOrThrow = (stationNumber: number) => {
 	);
 
 	if (!station) {
-		throw new Error(`Station with number ${stationNumber} not found`);
+		throw new Error(`[State] Station with number ${stationNumber} not found`);
 	}
 
 	return station;
@@ -166,15 +166,7 @@ export const updateStationSync = (
 	stationNumber: number,
 	updater: (station: typeof Station.infer) => void,
 ) => {
-	updateStateSync((state) => {
-		const station = state.stations.find(
-			(s) => s.startggStationNumber === stationNumber,
-		);
-
-		if (!station) {
-			throw new Error(`[State] Station with number ${stationNumber} not found`);
-		}
-
-		updater(station);
+	updateStateSync(() => {
+		updater(getStationOrThrow(stationNumber));
 	});
 };

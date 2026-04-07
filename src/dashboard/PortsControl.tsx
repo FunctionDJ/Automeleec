@@ -6,17 +6,13 @@ import {
 	Typography,
 } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { PlayerInCurrentSet, Ports, Station } from "../../backend/state";
 import { getPlayersFromCurrentSet } from "../../shared/entrant-utilities";
 import { trpc } from "../trpc-client";
 
 export function PortsControl({ station }: { station: typeof Station.infer }) {
 	const [input, setInput] = useState(station.ports);
-
-	useEffect(() => {
-		setInput(station.ports);
-	}, [station.ports]);
 
 	const mutation = useMutation(trpc.dashboard.setPorts.mutationOptions());
 

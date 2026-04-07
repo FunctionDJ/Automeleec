@@ -20,14 +20,13 @@ import { useState } from "react";
 import type { State } from "../../backend/state";
 import { trpc } from "../trpc-client";
 
-// TODO code review this file fully, it's fully AI
-
 export function DashboardSettingsControl({
 	state,
 }: {
 	state: typeof State.infer;
 }) {
 	const [settingsOpen, setSettingsOpen] = useState(false);
+
 	const [tournamentSlug, setTournamentSlug] = useState(
 		state.startggTournamentSlug,
 	);
@@ -44,64 +43,20 @@ export function DashboardSettingsControl({
 		enabled: settingsOpen && state.startggTournamentId !== null,
 	});
 
-	const streamQueues = streamQueuesQuery.data;
-
-	const openSettings = () => {
-		setTournamentSlug(state.startggTournamentSlug);
-		setSettingsOpen(true);
-	};
-
-	const closeSettings = () => {
-		setSettingsOpen(false);
-	};
-
-	const submitTournamentSlug = () => {
-		if (tournamentSlug === null) {
-			return;
-		}
-
-		if (
-			state.startggTournamentId !== null &&
-			!globalThis.confirm(
-				"This will replace the current start.gg tournament and reset tracked stream queue. Continue?",
-			)
-		) {
-			return;
-		}
-
-		setTournamentMutation.mutate({ startggTournamentSlug: tournamentSlug });
-	};
-
-	const selectStreamQueue = (queueId: string | null) => {
-		if (
-			state.startggStreamQueueIdToTrack !== null &&
-			state.startggStreamQueueIdToTrack !== queueId &&
-			!globalThis.confirm(
-				"This will replace the currently tracked stream queue. Continue?",
-			)
-		) {
-			return;
-		}
-
-		setStreamQueueMutation.mutate({ startggStreamQueueIdToTrack: queueId });
-	};
-
 	return (
 		<>
 			<Tooltip title="Tournament and stream settings">
 				<IconButton
-					onClick={openSettings}
-					aria-label="Open tournament and stream settings"
+					onClick={() => {
+						setTournamentSlug(state.startggTournamentSlug);
+						setSettingsOpen(true);
+					}}
 					sx={{
 						border: "1px solid",
 						borderColor: "divider",
 						bgcolor: "action.selected",
-						color: "primary.light",
-						transition: "all 120ms ease-out",
 						"&:hover": {
-							bgcolor: "action.hover",
 							borderColor: "primary.main",
-							boxShadow: 2,
 						},
 					}}
 				>
@@ -109,8 +64,12 @@ export function DashboardSettingsControl({
 				</IconButton>
 			</Tooltip>
 
-			<Dialog open={settingsOpen} onClose={closeSettings} fullWidth>
-				<DialogTitle>Tournament & Stream Queue</DialogTitle>
+			<Dialog
+				open={settingsOpen}
+				onClose={() => setSettingsOpen(false)}
+				fullWidth
+			>
+				<DialogTitle>Tournament & Stream Queue Settings</DialogTitle>
 				<DialogContent className="flex flex-col gap-4">
 					<Typography color="text.secondary">
 						Current tournament ID: {state.startggTournamentId ?? "(none)"}
@@ -127,7 +86,24 @@ export function DashboardSettingsControl({
 						/>
 						<Button
 							variant="contained"
-							onClick={submitTournamentSlug}
+							onClick={() => {
+								if (tournamentSlug === null) {
+									return;
+								}
+
+								if (
+									state.startggTournamentId !== null &&
+									!globalThis.confirm(
+										"This will replace the current start.gg tournament and reset tracked stream queue. Continue?",
+									)
+								) {
+									return;
+								}
+
+								setTournamentMutation.mutate({
+									startggTournamentSlug: tournamentSlug,
+								});
+							}}
 							disabled={setTournamentMutation.isPending}
 						>
 							Set Tournament
@@ -135,6 +111,11 @@ export function DashboardSettingsControl({
 					</div>
 
 					<Divider />
+
+					<Typography color="text.secondary">
+						Current stream queue:{" "}
+						{state.startggStreamQueueIdToTrack ?? "(none)"}
+					</Typography>
 
 					<FormControl>
 						<InputLabel>Stream Queue</InputLabel>
@@ -146,23 +127,46 @@ export function DashboardSettingsControl({
 								setStreamQueueMutation.isPending
 							}
 							value={state.startggStreamQueueIdToTrack}
-							onChange={(event) => selectStreamQueue(event.target.value)}
+							onChange={(event) => {
+								const queueId = event.target.value;
+
+								if (
+									state.startggStreamQueueIdToTrack !== null &&
+									state.startggStreamQueueIdToTrack !== queueId &&
+									!globalThis.confirm(
+										"This will replace the currently tracked stream queue. Continue?",
+									)
+								) {
+									return;
+								}
+
+								setStreamQueueMutation.mutate({
+									startggStreamQueueIdToTrack: queueId,
+								});
+							}}
 						>
-							{streamQueues?.map((queue) => (
+							{streamQueuesQuery.data?.map((queue) => (
 								<MenuItem key={queue.id} value={queue.id}>
 									{queue.stream.shortName} ({queue.stream.streamName})
+									{" – Platform: "}
+									{queue.stream.streamSource}
+									{" – Online: "}
+									{queue.stream.isOnline ? "🟢" : "🔴"}
+									{" – Enabled: "}
+									{queue.stream.enabled ? "✅" : "❌"}
 								</MenuItem>
 							))}
 						</Select>
 					</FormControl>
-
-					<Typography color="text.secondary">
-						Current stream queue:{" "}
-						{state.startggStreamQueueIdToTrack ?? "(none)"}
-					</Typography>
 				</DialogContent>
 				<DialogActions>
-					<Button onClick={closeSettings}>Close</Button>
+					<Button
+						onClick={() => {
+							setSettingsOpen(false);
+						}}
+					>
+						Close
+					</Button>
 				</DialogActions>
 			</Dialog>
 		</>
