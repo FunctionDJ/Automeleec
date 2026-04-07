@@ -6,6 +6,7 @@ import {
 } from "@mui/material";
 import { useSubscription } from "@trpc/tanstack-react-query";
 import { trpc } from "../trpc-client";
+import { TrpcErrorNotifications } from "../TrpcErrorNotifications";
 import { CenterTextControl } from "./CenterTextControl";
 import { StationPanel } from "./StationPanel";
 import { DashboardSettingsControl } from "./DashboardSettingsControl";
@@ -63,6 +64,7 @@ export function App() {
 					))}
 				</div>
 			</div>
+			<TrpcErrorNotifications />
 		</ThemeProvider>
 	);
 }

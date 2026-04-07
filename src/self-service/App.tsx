@@ -1,6 +1,7 @@
 import { CircularProgress, DialogContentText } from "@mui/material";
 import { useSubscription } from "@trpc/tanstack-react-query";
 import { trpc } from "../trpc-client";
+import { TrpcErrorNotifications } from "../TrpcErrorNotifications";
 import { StationComponent } from "./Station";
 
 export function App() {
@@ -41,6 +42,7 @@ export function App() {
 					/>
 				))}
 			</div>
+			<TrpcErrorNotifications />
 		</div>
 	);
 }
