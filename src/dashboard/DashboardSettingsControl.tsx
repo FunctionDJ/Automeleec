@@ -44,12 +44,7 @@ export function DashboardSettingsControl({
 		enabled: settingsOpen && state.startggTournamentId !== null,
 	});
 
-	const streamQueues = streamQueuesQuery.data ?? [];
-	const selectedStreamQueueValue =
-		state.startggStreamQueueIdToTrack !== null &&
-		streamQueues.some((queue) => queue.id === state.startggStreamQueueIdToTrack)
-			? state.startggStreamQueueIdToTrack
-			: "";
+	const streamQueues = streamQueuesQuery.data;
 
 	const openSettings = () => {
 		setTournamentSlug(state.startggTournamentSlug);
@@ -77,7 +72,7 @@ export function DashboardSettingsControl({
 		setTournamentMutation.mutate({ startggTournamentSlug: tournamentSlug });
 	};
 
-	const selectStreamQueue = (queueId: string) => {
+	const selectStreamQueue = (queueId: string | null) => {
 		if (
 			state.startggStreamQueueIdToTrack !== null &&
 			state.startggStreamQueueIdToTrack !== queueId &&
@@ -150,10 +145,10 @@ export function DashboardSettingsControl({
 								streamQueuesQuery.isLoading ||
 								setStreamQueueMutation.isPending
 							}
-							value={selectedStreamQueueValue}
+							value={state.startggStreamQueueIdToTrack}
 							onChange={(e) => selectStreamQueue(e.target.value)}
 						>
-							{streamQueues.map((queue) => (
+							{streamQueues?.map((queue) => (
 								<MenuItem key={queue.id} value={queue.id}>
 									{queue.stream.shortName} ({queue.stream.streamName})
 								</MenuItem>
