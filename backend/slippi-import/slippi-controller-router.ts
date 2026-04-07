@@ -1,6 +1,3 @@
-import { type } from "arktype";
-import { router } from "../trpc-server";
-import { TRPCError } from "@trpc/server";
 import {
 	ConnectionEvent,
 	ConnectionStatus,
@@ -12,16 +9,14 @@ import {
 	type GameEndType,
 	type GameStartType,
 } from "@slippi/slippi-js/node";
+import { TRPCError } from "@trpc/server";
+import { type } from "arktype";
 import { startReplayWriter } from "../replay-export/replay-export";
-import {
-	globalState,
-	updateStateSync,
-	updateStationSync,
-	type Station,
-} from "../state";
-import { updateStateOnSettingsEvent } from "./update-state-on-settings-event";
 import { reportBracketSetBySlippiData } from "../startgg-export/report-bracket-set-by-slippi-data";
+import { globalState, updateStationSync, type Station } from "../state";
 import { stationProcedure } from "../station-procedure";
+import { router } from "../trpc-server";
+import { updateStateOnSettingsEvent } from "./update-state-on-settings-event";
 
 // TODO maybe we should just use ConnectionStatus directly for state instead of having to do mapping
 
@@ -80,7 +75,12 @@ const createSlippiConnectionSet = (stationNumber: number) => {
 		parser.handleCommand(command, payload),
 	);
 
-	startReplayWriter(stream, stationNumber);
+	startReplayWriter(stream, stationNumber).catch((err: unknown) => {
+		console.error(
+			`[SlippiController] [Station ${stationNumber} at ${conn.getSettings().ipAddress}:${conn.getSettings().port}] ReplayWriter error:`,
+			err,
+		);
+	});
 
 	return {
 		conn,
