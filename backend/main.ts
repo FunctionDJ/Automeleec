@@ -47,5 +47,7 @@ const server = createServer((request, response) => {
 });
 
 server.listen(PORT, () => {
-	prefixLogger("Main").info(`Server is starting on port ${PORT}...`);
+	prefixLogger("Main").info(
+		`Server is starting on http://localhost:${PORT} ...`,
+	);
 });

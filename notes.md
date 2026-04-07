@@ -9,7 +9,7 @@
 
 - listen to loggingSubscription errors and warnings and add a logging box where "info" is also stored with the others (!!!)
 - show warning or "handwarmers (?)" when a slippi set is started without ports assignment / set started
-- manual overrides für overlay (characters + costume, score, runde/pool etc)
+- manual overrides für overlay (runde/pool etc)
 - nach set ende das gerade abgeschlossene set noch 1-2 minuten anzeigen aber mit "next set" button
 - tracken, ob eine station sich via self-service gerade im setup befindet und dann manual port assignment disablen, damit man sich mit manual ports assignment etc nicht in die quere kommt
 

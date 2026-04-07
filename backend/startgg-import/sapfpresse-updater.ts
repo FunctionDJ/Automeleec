@@ -1,7 +1,7 @@
 import { type } from "arktype";
 import { globalState as globalState, updateStateSync } from "../state";
 import { SetType } from "./startgg-schemas";
-import { getNewStationByStreamQueueSets } from "./startgg-transformers";
+import { transformStationByStreamQueueSets } from "./startgg-transformers";
 import { fetchStartGG } from "../startgg-interface/fetch-startgg";
 import { prefixLogger } from "../logger/logger";
 
@@ -92,7 +92,7 @@ const fetchStartGGAndUpdateState = async () => {
 
 	updateStateSync((state) => {
 		for (const station of state.stations) {
-			getNewStationByStreamQueueSets(station, streamQueue.sets);
+			transformStationByStreamQueueSets(station, streamQueue.sets);
 		}
 	});
 };

@@ -106,7 +106,7 @@ const setToUpcomingSet = (
 	};
 };
 
-export const getNewStationByStreamQueueSets = (
+export const transformStationByStreamQueueSets = (
 	station: typeof Station.infer,
 	allSetsInStreamQueue: (typeof SetType.infer)[],
 ) => {
@@ -118,6 +118,10 @@ export const getNewStationByStreamQueueSets = (
 	const sggSetsAtThisStation = allSetsInStreamQueue.filter(
 		(set) => set.station.number === station.startggStationNumber,
 	);
+
+	station.upcomingSets = sggSetsAtThisStation
+		.filter((set) => set.id !== station.currentSet?.startggSetId)
+		.map((set) => setToUpcomingSet(set));
 
 	const activeSSGSetsAtThisStation = sggSetsAtThisStation.filter(
 		(set) => set.state === "active",
@@ -146,10 +150,12 @@ export const getNewStationByStreamQueueSets = (
 		currentSGGSet.id !== station.currentSet?.startggSetId // TODO we want to have a feature where when a set finished, the currentSet lingers around for like a 30 seconds till a minute, so maybe we expand the currentSet to include a finishedAt field and only override it once the time has passed
 	) {
 		station.currentSet = setToCurrentSet(currentSGGSet);
+		station.ports = [null, null, null, null];
 	} else {
 		// update score
 
 		const { currentSet } = station;
+
 		if (currentSet === null) {
 			// this case is shown via dashboard as "no current set in state"
 			station.currentSet = null;
@@ -171,8 +177,4 @@ export const getNewStationByStreamQueueSets = (
 		currentSet.entrantA.score = valueA;
 		currentSet.entrantB.score = valueB;
 	}
-
-	station.upcomingSets = sggSetsAtThisStation
-		.filter((set) => set.id !== station.currentSet?.startggSetId)
-		.map((set) => setToUpcomingSet(set));
 };
