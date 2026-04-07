@@ -26,7 +26,10 @@ const Set_ = type({
 	}).array(),
 });
 
+// we fetch the active set basically just to get the game selections for the next report to startgg
+// TODO do we use any other data from this?
 export const fetchActiveSet = async (stationId: number) => {
+	// TODO replace tournament slug with slug or id from state
 	const data = await fetchStartGG(`
 			query GetSetAtStation {
 				tournament(slug: "${String(Bun.env.TOURNAMENT_SLUG)}") {

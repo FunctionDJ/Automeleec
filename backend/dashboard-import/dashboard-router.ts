@@ -84,7 +84,7 @@ export const dashboardRouter = router({
 	setStartggStreamQueueIdToTrack: publicProcedure
 		.input(type({ startggStreamQueueIdToTrack: "string|null" }))
 		.mutation(({ input }) => {
-			// TODO dont auto-start startgg fetch-loop but start it when this is set?
+			// [FUTURE] dont auto-start startgg fetch-loop but start it when this is set?
 			updateStateSync((state) => {
 				state.startggStreamQueueIdToTrack = input.startggStreamQueueIdToTrack;
 			});

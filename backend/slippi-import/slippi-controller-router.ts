@@ -157,8 +157,8 @@ export const slippiRouter = router({
 		);
 
 		connectionSet.conn.disconnect();
-		connectionSet.parser.reset(); // next SETTINGS event won't be emitted without this
-		connectionSet.stream.restart(); // TODO unsure if necessary
+		connectionSet.parser.reset(); // next SETTINGS event won't be emitted without resetting the parser
+		connectionSet.stream.restart(); // [SLIPPI] unsure if necessary, i've asked on slippi discord without response yet.
 	}),
 	resetError: stationProcedure.mutation(({ ctx }) => {
 		if (ctx.station.slippi.slippiState.status !== "error") {

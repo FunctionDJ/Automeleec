@@ -3,13 +3,7 @@ import { globalState as globalState, updateStateSync } from "../state";
 import { SetType } from "./startgg-schemas";
 import { getNewStationByStreamQueueSets } from "./startgg-transformers";
 import { fetchStartGG } from "../startgg-interface/fetch-startgg";
-
-// TODO
-
-/**
- * the request and the surrounding code need to consider the stream queue.
- * right now, all sets from the stations are fetched and the stream queue is ignored.
- */
+import { prefixLogger } from "../logger/logger";
 
 const fetchStartGGAndUpdateState = async () => {
 	if (
@@ -18,6 +12,14 @@ const fetchStartGGAndUpdateState = async () => {
 	) {
 		return;
 	}
+
+	/**
+	 * i've asked on startgg discord and other users said that
+	 * it's not currently possible to request a specific streamQueue.
+	 * so we have to fetch all and then filter ourselves.
+	 * might be wasteful for their bandwidth and processing
+	 * but i don't know of a solution.
+	 */
 
 	const data = await fetchStartGG(`
     query StreamQueues {

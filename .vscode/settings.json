@@ -31,5 +31,14 @@
 			"approve": true,
 			"matchCommandLine": true
 		}
-	}
+	},
+	"todo-tree.general.tags": [
+		"BUG",
+		"HACK",
+		"FIXME",
+		"TODO",
+		"[FUTURE]",
+		"[STARTGG]",
+		"[SLIPPI]"
+	]
 }

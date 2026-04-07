@@ -11,7 +11,7 @@ import {
 import { startReplayWriter } from "../replay-export/replay-export";
 import { updateStationSync, type Station } from "../state";
 
-// TODO maybe we should just use ConnectionStatus directly for state instead of having to do mapping
+// [FUTURE] maybe we should just use ConnectionStatus directly for state instead of having to do mapping
 
 const statusMap = {
 	[ConnectionStatus.CONNECTING]: "connecting",

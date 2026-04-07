@@ -80,7 +80,7 @@ export default defineConfig([
 		},
 	},
 	{
-		// TODO replace all console calls with standardized logger functions and remove this rule
+		// [FUTURE] replace all console calls with standardized logger functions and remove this rule
 		files: ["backend/**/*.ts"],
 		rules: {
 			"ban-console-without-prefix/ban-console-without-prefix": ["error"],
