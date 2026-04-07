@@ -7,6 +7,7 @@ import {
 	slippiCharacterToStartGGCharacter,
 	slippiStageToStartGGStageId,
 } from "./slippi-to-startgg";
+import { prefixLogger } from "../logger/logger";
 
 export const reportBracketSetBySlippiData = async ({
 	gameEnd,
@@ -15,32 +16,30 @@ export const reportBracketSetBySlippiData = async ({
 	gameEnd: GameEndType;
 	stationNumber: number;
 }) => {
-	const logPrefix = `[StartggExport] [Station ${stationNumber}]`;
-	console.log(`${logPrefix} Reporting to startgg...`);
+	const logger = prefixLogger("StartggExport", `Station ${stationNumber}`);
+	logger.info(`Reporting to startgg...`);
 
 	const activeSet = await fetchActiveSet(stationNumber);
 
 	if (activeSet === undefined) {
-		console.error(`${logPrefix} No active set found`);
+		logger.error(`No active set found`);
 		return;
 	}
 
 	// Determine winner based on which port won
 	const winnerPortIndex = gameEnd.placements.findIndex((p) => p.position === 0);
-	console.log(`${logPrefix} winnerPortIndex`, winnerPortIndex);
+	logger.info(`winnerPortIndex: ${winnerPortIndex}`);
 
 	if (winnerPortIndex === -1) {
-		console.error(
-			`${logPrefix} Could not determine winner from placements, skipping report`,
-		);
+		logger.error(`Could not determine winner from placements, skipping report`);
 		return;
 	}
 
 	const station = getStationOrThrow(stationNumber);
 
 	if (station.mode !== "startgg") {
-		console.warn(
-			`${logPrefix} Station mode is not "startgg" (is "${station.mode}"), skipping report`,
+		logger.warn(
+			`Station mode is not "startgg" (is "${station.mode}"), skipping report`,
 		);
 		return;
 	}
@@ -48,16 +47,16 @@ export const reportBracketSetBySlippiData = async ({
 	const { currentSet } = station;
 
 	if (currentSet === null) {
-		console.error(`${logPrefix} No current set in state, skipping report`);
+		logger.error(`No current set in state, skipping report`);
 		return;
 	}
 
 	const winnerParticipantId = station.ports[winnerPortIndex];
-	console.log(`${logPrefix} winnerParticipantId`, winnerParticipantId);
+	logger.info(`winnerParticipantId: ${winnerParticipantId}`);
 
 	if (winnerParticipantId === null) {
-		console.error(
-			`${logPrefix} Winner port ${winnerPortIndex} has no participant mapped, skipping report`,
+		logger.error(
+			`Winner port ${winnerPortIndex} has no participant mapped, skipping report`,
 		);
 		return;
 	}
@@ -73,17 +72,14 @@ export const reportBracketSetBySlippiData = async ({
 	);
 
 	if (!winnerEntrant) {
-		console.error(
-			`${logPrefix} Could not find entrant for participant ${winnerParticipantId}`,
+		logger.error(
+			`Could not find entrant for participant ${winnerParticipantId}`,
 		);
+
 		return;
 	}
 
-	console.log(
-		`${logPrefix} winnerEntrant`,
-		winnerEntrant,
-		`(${winnerEntrant.player1.tag} / ${winnerEntrant.player2?.tag})`,
-	);
+	logger.info("winnerEntrant", { winnerEntrant });
 
 	const existingGames = activeSet.games ?? [];
 
@@ -138,7 +134,7 @@ export const reportBracketSetBySlippiData = async ({
 		},
 	];
 
-	console.log(`${logPrefix} gameData`, JSON.stringify(gameData, null, 2));
+	logger.info(`gameData`, { gameData });
 
 	// the following is the winnerId for the whole set
 

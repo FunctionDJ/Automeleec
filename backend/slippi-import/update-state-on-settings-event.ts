@@ -1,28 +1,29 @@
 import type { GameStartType, PlayerType } from "@slippi/slippi-js/node";
+import { prefixLogger } from "../logger/logger";
 import { updateStationSync } from "../state";
 import { applyPlayerTypeToState } from "./apply-playertype";
 import { findPlayerInSlippiSettings } from "./find-player-in-slippi-settings";
 
 export const updateStateOnSettingsEvent = (
-	logPrefix: string,
 	settingsEvent: GameStartType,
 	stationNumber: number,
 ) => {
 	updateStationSync(stationNumber, (station) => {
+		const logger = prefixLogger("SlippiController", `Station ${stationNumber}`);
 		const { currentSet } = station;
 
 		if (currentSet === null) {
-			throw new Error(
-				`${logPrefix} Received SETTINGS event but there is no current set in state.`,
-			);
+			const message = `Received SETTINGS event but there is no current set in state.`;
+			logger.error(message);
+			throw new Error(message);
 		}
 
 		const { stageId } = settingsEvent;
 
 		if (stageId === undefined) {
-			throw new Error(
-				`${logPrefix} Received SETTINGS event but stageId is undefined.`,
-			);
+			const message = `Received SETTINGS event but stageId is undefined.`;
+			logger.error(message);
+			throw new Error(message);
 		}
 
 		const entrantAP1 = findPlayerInSlippiSettings(
@@ -62,8 +63,8 @@ export const updateStateOnSettingsEvent = (
 			(settingsEvent.isTeams === true &&
 				(entrantAP2 === null || entrantBP2 === null))
 		) {
-			console.warn(
-				`${logPrefix} Could not find all players from currentSet in SETTINGS event (i.e. no port found), so it's skipped.`,
+			logger.warn(
+				`Could not find all players from currentSet in SETTINGS event (i.e. no port found), so it's skipped.`,
 			);
 
 			return;

@@ -36,6 +36,7 @@ export default defineConfig([
 			},
 		},
 		rules: {
+			"no-console": "error",
 			curly: "error",
 			// allow null because i prefer explicit null and avoid undefined
 			"unicorn/no-null": "off",
@@ -77,94 +78,6 @@ export default defineConfig([
 		ignores: ["src/common-main*.tsx"],
 		rules: {
 			"unicorn/filename-case": ["error", { case: "pascalCase" }],
-		},
-	},
-	{
-		// [FUTURE] replace all console calls with standardized logger functions and remove this rule
-		files: ["backend/**/*.ts"],
-		rules: {
-			"ban-console-without-prefix/ban-console-without-prefix": ["error"],
-		},
-		plugins: {
-			"ban-console-without-prefix": {
-				rules: {
-					"ban-console-without-prefix": {
-						meta: {
-							type: "problem",
-							docs: {
-								description:
-									"Disallow console calls unless first argument starts with `[` or `${logPrefix}`",
-								recommended: false,
-							},
-							schema: [],
-							messages: {
-								banned: "Console call must start with `[` or `${logPrefix}`.",
-							},
-						},
-						create: (context) => ({
-							/**
-							 * @param {import('estree').SimpleCallExpression} node
-							 */
-							CallExpression(node) {
-								if (
-									node.callee.type !== "MemberExpression" ||
-									node.callee.object.type !== "Identifier" ||
-									node.callee.object.name !== "console" ||
-									node.callee.property.type !== "Identifier"
-								) {
-									return;
-								}
-
-								const method = node.callee.property.name;
-
-								if (!Object.keys(console).includes(method)) {
-									return;
-								}
-
-								const firstArg = node.arguments[0];
-
-								if (
-									!firstArg ||
-									(firstArg.type !== "Literal" &&
-										firstArg.type !== "TemplateLiteral")
-								) {
-									return;
-								}
-
-								if (firstArg.type === "Literal") {
-									// is literal
-									if (typeof firstArg.value !== "string") {
-										context.report({ node, messageId: "banned" });
-										return;
-									}
-
-									// is string literal
-									if (firstArg.value.startsWith("[")) {
-										return;
-									}
-
-									context.report({ node, messageId: "banned" });
-								} else {
-									// is template literal
-
-									const firstExpression = firstArg.expressions[0];
-
-									if (
-										firstArg.quasis[0].value.raw.startsWith("[") ||
-										(firstExpression.type === "Identifier" &&
-											firstExpression.name === "logPrefix" &&
-											firstArg.quasis[0].value.raw === "")
-									) {
-										return;
-									}
-
-									context.report({ node, messageId: "banned" });
-								}
-							},
-						}),
-					},
-				},
-			},
 		},
 	},
 ]);

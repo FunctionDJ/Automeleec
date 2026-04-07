@@ -10,6 +10,7 @@ import {
 } from "@slippi/slippi-js/node";
 import { startReplayWriter } from "../replay-export/replay-export";
 import { updateStationSync, type Station } from "../state";
+import { prefixLogger } from "../logger/logger";
 
 // [FUTURE] maybe we should just use ConnectionStatus directly for state instead of having to do mapping
 
@@ -24,6 +25,7 @@ const statusMap = {
 >;
 
 export const createSlippiConnectionSet = (stationNumber: number) => {
+	const logger = prefixLogger("SlippiController", `Station ${stationNumber}`);
 	const conn = new ConsoleConnection({ autoReconnect: true });
 	const stream = new SlpStream();
 	const parser = new SlpParser();
@@ -31,8 +33,8 @@ export const createSlippiConnectionSet = (stationNumber: number) => {
 	conn.on(ConnectionEvent.STATUS_CHANGE, (newSlippiStatus) => {
 		const newStationSlippiStatus = statusMap[newSlippiStatus];
 
-		console.log(
-			`[SlippiController] [Station ${stationNumber} at ${conn.getSettings().ipAddress}:${conn.getSettings().port}] New status: ${newStationSlippiStatus}`,
+		logger.info(
+			`[${conn.getSettings().ipAddress}:${conn.getSettings().port}] New connection status: ${newStationSlippiStatus}`,
 		);
 
 		updateStationSync(stationNumber, (station) => {
@@ -48,8 +50,8 @@ export const createSlippiConnectionSet = (stationNumber: number) => {
 	});
 
 	conn.on(ConnectionEvent.ERROR, (error) => {
-		console.error(
-			`[SlippiController] [Station ${stationNumber} at ${conn.getSettings().ipAddress}:${conn.getSettings().port}] Connection error:`,
+		logger.error(
+			`[${conn.getSettings().ipAddress}:${conn.getSettings().port}] Connection error:`,
 			error,
 		);
 
@@ -68,8 +70,8 @@ export const createSlippiConnectionSet = (stationNumber: number) => {
 	);
 
 	startReplayWriter(stream, stationNumber).catch((error: unknown) => {
-		console.error(
-			`[SlippiController] [Station ${stationNumber} at ${conn.getSettings().ipAddress}:${conn.getSettings().port}] ReplayWriter error:`,
+		logger.error(
+			`[${conn.getSettings().ipAddress}:${conn.getSettings().port}] ReplayWriter error:`,
 			error,
 		);
 	});

@@ -11,6 +11,7 @@ import { stationProcedure } from "../station-procedure";
 import { router } from "../trpc-server";
 import { createSlippiConnectionSet } from "./create-slippi-connectionset";
 import { updateStateOnSettingsEvent } from "./update-state-on-settings-event";
+import { prefixLogger } from "../logger/logger";
 
 /** maps from stationNumber to connectionSets */
 const slippiConnectionSets: Record<
@@ -56,20 +57,22 @@ export const slippiRouter = router({
 			});
 		}
 
-		const logPrefix = `[SlippiController] [Station ${ctx.station.startggStationNumber} at ${ctx.station.slippi.ip}:${ctx.station.slippi.port}]`;
+		const logger = prefixLogger(
+			"SlippiController",
+			`Station ${ctx.station.startggStationNumber} at ${ctx.station.slippi.ip}:${ctx.station.slippi.port}`,
+		);
 
 		const settingsListener = (settings: GameStartType) => {
 			if (settings.players.some((p) => p.type === 1)) {
 				// 0 === human, 1 === CPU
-				console.log(
-					`${logPrefix} CPU player detected, skipping SETTINGS processing.`,
-				);
+				logger.info(`CPU player detected, skipping SETTINGS processing.`);
+
 				return;
 			}
 
 			if (settings.players.length !== 2 && settings.players.length !== 4) {
-				console.log(
-					`${logPrefix} Uneven number of players (solo practice?), skipping SETTINGS processing.`,
+				logger.warn(
+					`Uneven number of players (solo practice?), skipping SETTINGS processing.`,
 				);
 
 				// TODO this logging is cool and all but i dont think it prevents the system from trying to submit the data to startgg on game end, or how does it currently behave?
@@ -79,20 +82,17 @@ export const slippiRouter = router({
 				return;
 			}
 
-			updateStateOnSettingsEvent(
-				logPrefix,
-				settings,
-				ctx.station.startggStationNumber,
-			);
+			updateStateOnSettingsEvent(settings, ctx.station.startggStationNumber);
 
-			console.log(
-				`${logPrefix} Settings:`,
-				settings.players.map((p) => ({
-					port: p.port,
-					characterId: p.characterId,
-					displayName: p.displayName,
-					connectCode: p.connectCode,
-				})),
+			logger.info(
+				`Settings: ${JSON.stringify(
+					settings.players.map((p) => ({
+						port: p.port,
+						characterId: p.characterId,
+						displayName: p.displayName,
+						connectCode: p.connectCode,
+					})),
+				)}`,
 			);
 		};
 
@@ -100,14 +100,14 @@ export const slippiRouter = router({
 		connectionSet.parser.on(SlpParserEvent.SETTINGS, settingsListener);
 
 		const endListener = (gameEnd: GameEndType) => {
-			console.log(`${logPrefix} Game end data:`, gameEnd);
+			logger.info("Game end", gameEnd);
 
 			reportBracketSetBySlippiData({
 				stationNumber: ctx.station.startggStationNumber,
 				gameEnd,
 			})
 				.catch((error: unknown) => {
-					console.error(`${logPrefix} Failed to report set:`, error);
+					logger.error("Failed to report set", error);
 				})
 				.finally(() => {
 					// parser.reset() is necessary for SlpParserEvent.SETTINGS to be emitted again
@@ -168,27 +168,30 @@ export const slippiRouter = router({
 			});
 		}
 
-		console.log(
-			`[SlippiController] [Station ${ctx.station.startggStationNumber}] Resetting error state`,
-		);
+		prefixLogger(
+			"SlippiController",
+			`Station ${ctx.station.startggStationNumber}`,
+		).info(`Resetting error state`);
 
 		ctx.station.slippi.slippiState = { status: "disconnected" };
 	}),
 	editIp: inactiveStationProcedure
 		.input(type({ ip: "string" }))
 		.mutation(({ input, ctx }) => {
-			console.log(
-				`[SlippiController] [Station ${ctx.station.startggStationNumber}] Changing IP to ${input.ip}`,
-			);
+			prefixLogger(
+				"SlippiController",
+				`Station ${ctx.station.startggStationNumber}`,
+			).info(`Changing IP to ${input.ip}`);
 
 			ctx.station.slippi.ip = input.ip;
 		}),
 	editPort: inactiveStationProcedure
 		.input(type({ port: "number" }))
 		.mutation(({ input, ctx }) => {
-			console.log(
-				`[SlippiController] [Station ${ctx.station.startggStationNumber}] Changing port to ${input.port}`,
-			);
+			prefixLogger(
+				"SlippiController",
+				`Station ${ctx.station.startggStationNumber}`,
+			).info(`Changing port to ${input.port}`);
 
 			ctx.station.slippi.port = input.port;
 		}),

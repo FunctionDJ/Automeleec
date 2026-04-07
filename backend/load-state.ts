@@ -1,8 +1,9 @@
 import { type } from "arktype";
 import { State, type Station } from "./state";
+import { prefixLogger } from "./logger/logger";
 
 export const loadState = async (): Promise<typeof State.infer> => {
-	const logPrefix = "[loadState]";
+	const logger = prefixLogger("LoadState");
 	const stateFile = Bun.file("state.json");
 
 	if (await stateFile.exists()) {
@@ -10,13 +11,9 @@ export const loadState = async (): Promise<typeof State.infer> => {
 		const stateValidateResult = State(json);
 
 		if (stateValidateResult instanceof type.errors) {
-			console.error(
-				logPrefix,
-				"state file is invalid:",
-				stateValidateResult.summary,
-			);
+			logger.error(`state file is invalid: ${stateValidateResult.summary}`);
 		} else {
-			console.log(logPrefix, "loaded state.json");
+			logger.info("loaded state.json");
 
 			for (const station of stateValidateResult.stations) {
 				station.slippi.slippiState.status = "disconnected";
@@ -26,7 +23,7 @@ export const loadState = async (): Promise<typeof State.infer> => {
 		}
 	}
 
-	console.log(logPrefix, "using default state...");
+	logger.info("using default state...");
 
 	return {
 		stations: [1, 2, 3, 4].map(

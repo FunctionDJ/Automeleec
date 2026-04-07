@@ -84,15 +84,16 @@ const fetchStartGGAndUpdateState = async () => {
 	);
 
 	if (streamQueue === undefined) {
-		throw new Error(
-			`Stream queue with id ${globalState.startggStreamQueueIdToTrack} not found in start.gg response, either wrong tournament or deleted stream queue configured`,
-		);
+		const message = `Stream queue with id ${globalState.startggStreamQueueIdToTrack} not found in start.gg response, either wrong tournament or deleted stream queue configured`;
+
+		prefixLogger("StartggImport").error(message);
+		throw new Error(message);
 	}
 
 	updateStateSync((state) => {
-		state.stations = state.stations.map((oldStation) =>
-			getNewStationByStreamQueueSets(oldStation, streamQueue.sets),
-		);
+		for (const station of state.stations) {
+			getNewStationByStreamQueueSets(station, streamQueue.sets);
+		}
 	});
 };
 
@@ -100,7 +101,7 @@ void fetchStartGGAndUpdateState();
 
 setInterval(() => {
 	fetchStartGGAndUpdateState().catch((error: unknown) => {
-		console.error(
+		prefixLogger("StartggImport").error(
 			"[StartggImport] Error fetching or JSON-parsing start.gg data (skipping state update):",
 			error,
 		);

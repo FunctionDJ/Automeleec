@@ -1,3 +1,4 @@
+import { prefixLogger } from "../logger/logger";
 import type {
 	CurrentSet,
 	EntrantInCurrentSet,
@@ -106,55 +107,61 @@ const setToUpcomingSet = (
 };
 
 export const getNewStationByStreamQueueSets = (
-	oldStation: typeof Station.infer,
+	station: typeof Station.infer,
 	allSetsInStreamQueue: (typeof SetType.infer)[],
-): typeof Station.infer => {
-	const logPrefix = `[StartggImport] [Station ${oldStation.startggStationNumber}]`;
-
-	// TODO
-
-	/**
-	 * i think this place also needs some code to handle filtering all station sets to those that are on the stream queue
-	 */
-
-	const sggSetsAtThisStation = allSetsInStreamQueue.filter(
-		(set) => set.station.number === oldStation.startggStationNumber,
+) => {
+	const logger = prefixLogger(
+		"StartggImport",
+		`Station ${station.startggStationNumber}`,
 	);
 
-	// TODO
+	const sggSetsAtThisStation = allSetsInStreamQueue.filter(
+		(set) => set.station.number === station.startggStationNumber,
+	);
 
-	/**
-	 * for example the below code is probably actually wrong because it should just do
-	 * "from the stream queue, take the top set at this station" and ignore the set state.
-	 */
-
-	const currentSGGSet = sggSetsAtThisStation.find(
+	const activeSSGSetsAtThisStation = sggSetsAtThisStation.filter(
 		(set) => set.state === "active",
 	);
 
-	const stationClone = { ...oldStation };
+	if (activeSSGSetsAtThisStation.length > 1) {
+		logger.warn(
+			`Found multiple active sets at this station in the stream queue. First one is picked, other(s) are considered upcoming!`,
+		);
+	}
+
+	// [STARTGG] asking on the discord right now.
+
+	/**
+	 *  the below code might not be as resilient as it could be because it should just do
+	 * "from the stream queue, take the top set from the queue at this station" and ignore the set state.
+	 * but as i learned now, the queue is basically completely up to the TOs to control, so i guess
+	 * you could have a two active sets in the queue.
+	 */
+
+	const [currentSGGSet] = activeSSGSetsAtThisStation;
 
 	// update current set if id changed
 	if (
 		currentSGGSet !== undefined &&
-		currentSGGSet.id !== stationClone.currentSet?.startggSetId
+		currentSGGSet.id !== station.currentSet?.startggSetId // TODO we want to have a feature where when a set finished, the currentSet lingers around for like a 30 seconds till a minute, so maybe we expand the currentSet to include a finishedAt field and only override it once the time has passed
 	) {
-		stationClone.currentSet = setToCurrentSet(currentSGGSet);
+		station.currentSet = setToCurrentSet(currentSGGSet);
 	} else {
 		// update score
 
-		const { currentSet } = stationClone;
-
+		const { currentSet } = station;
 		if (currentSet === null) {
 			// this case is shown via dashboard as "no current set in state"
-			return stationClone;
+			station.currentSet = null;
+			return;
 		}
 
 		if (currentSGGSet === undefined) {
-			console.warn(
-				`${logPrefix} Station has currentSet, but no active set (startgg) at this station, skipping score update`,
+			logger.warn(
+				`Station has currentSet, but no active set (startgg) at this station, skipping score update`,
 			);
-			return stationClone;
+
+			return;
 		}
 
 		const [slotA, slotB] = getSlotsFromSetOrThrow(currentSGGSet);
@@ -165,9 +172,7 @@ export const getNewStationByStreamQueueSets = (
 		currentSet.entrantB.score = valueB;
 	}
 
-	stationClone.upcomingSets = sggSetsAtThisStation
-		.filter((set) => set.id !== stationClone.currentSet?.startggSetId)
+	station.upcomingSets = sggSetsAtThisStation
+		.filter((set) => set.id !== station.currentSet?.startggSetId)
 		.map((set) => setToUpcomingSet(set));
-
-	return stationClone;
 };

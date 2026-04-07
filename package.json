@@ -25,9 +25,6 @@
 		],
 		"ignoreBinaries": [
 			"du"
-		],
-		"ignoreDependencies": [
-			"estree"
 		]
 	},
 	"dependencies": {

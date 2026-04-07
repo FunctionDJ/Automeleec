@@ -1,3 +1,4 @@
+import { prefixLogger } from "../logger/logger";
 import { fetchStartGG } from "../startgg-interface/fetch-startgg";
 
 export interface Selection {
@@ -19,9 +20,9 @@ export const reportBracketSet = async ({
 		selections: Selection[];
 	}[];
 }) => {
-	const logPrefix = `[StartggExport] [SetId ${setId}]`;
-	console.log(`${logPrefix} winnerId`, winnerId);
-	console.log(`${logPrefix} gameData`, JSON.stringify(gameData, null, 2));
+	const logger = prefixLogger("StartggExport", `SetId ${setId}`);
+	logger.info(`winnerId: ${winnerId}`);
+	logger.info(`gameData`, { gameData });
 
 	const variables: {
 		setId: number;

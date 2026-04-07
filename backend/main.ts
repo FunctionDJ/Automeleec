@@ -3,6 +3,7 @@ import { createServer } from "node:http";
 import { createServer as createViteServer, type ViteDevServer } from "vite";
 import { appRouter } from "./router";
 import "./startgg-import/sapfpresse-updater";
+import { prefixLogger } from "./logger/logger";
 
 /**
  * we're checking for temp replay files here and crashing early
@@ -46,5 +47,5 @@ const server = createServer((request, response) => {
 });
 
 server.listen(PORT, () => {
-	console.log(`[Main] Server listening on http://localhost:${PORT}`);
+	prefixLogger("Main").info(`Server is starting on port ${PORT}...`);
 });
