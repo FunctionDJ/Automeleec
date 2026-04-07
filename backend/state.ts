@@ -115,6 +115,7 @@ export const State = type({
 	/** determines from which stream queue to pull the sets from */
 	startggStreamQueueIdToTrack: "string|null",
 	startggTournamentId: "number.integer|null",
+	startggTournamentSlug: "string|null",
 });
 
 export const globalState = await loadState();

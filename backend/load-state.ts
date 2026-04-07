@@ -70,5 +70,6 @@ export const loadState = async (): Promise<typeof State.infer> => {
 		centerText: "",
 		startggStreamQueueIdToTrack: null,
 		startggTournamentId: null,
+		startggTournamentSlug: null,
 	};
 };

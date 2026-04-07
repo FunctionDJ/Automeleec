@@ -32,6 +32,7 @@ export const dashboardRouter = router({
 
 			updateStateSync((state) => {
 				state.startggTournamentId = validatedData.tournament.id;
+				state.startggTournamentSlug = input.startggTournamentSlug;
 				state.startggStreamQueueIdToTrack = null;
 			});
 		}),
@@ -61,7 +62,7 @@ export const dashboardRouter = router({
 
 		const validatedData = type({
 			tournament: {
-				streamQueue: {
+				streamQueue: type({
 					id: "string",
 					stream: {
 						enabled: "boolean",
@@ -76,14 +77,14 @@ export const dashboardRouter = router({
 							"'YOUTUBE'",
 						),
 					},
-				},
+				}).array(),
 			},
 		}).assert(response);
 
 		return validatedData.tournament.streamQueue;
 	}),
 	setStartggStreamQueueIdToTrack: publicProcedure
-		.input(type({ startggStreamQueueIdToTrack: "string" }))
+		.input(type({ startggStreamQueueIdToTrack: "string|null" }))
 		.mutation(({ input }) => {
 			// TODO dont auto-start startgg fetch-loop but start it when this is set?
 			updateStateSync((state) => {
