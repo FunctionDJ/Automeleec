@@ -27,10 +27,10 @@ const fetchStartGGAndUpdateState = async () => {
         id
         sets {
           id
+          fullRoundText
           round
           phaseGroup {
             displayIdentifier
-            numRounds
             bracketType
           }
           state

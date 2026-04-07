@@ -78,8 +78,10 @@ const setToCurrentSet = (
 
 	return {
 		startggSetId: set.id,
+		fullRoundText: set.fullRoundText,
+		round: set.round,
 		state: set.state,
-		phaseGroupDisplayIdentifier: set.phaseGroup.displayIdentifier,
+		phaseGroup: set.phaseGroup,
 		startedAt: set.startedAt ? new Date(set.startedAt) : null,
 		slippiStage: null,
 		entrantA: slotToCurrentSetEntrant(slotA),
@@ -94,8 +96,10 @@ const setToUpcomingSet = (
 
 	return {
 		startggSetId: set.id,
+		fullRoundText: set.fullRoundText,
+		round: set.round,
 		state: set.state,
-		phaseGroupDisplayIdentifier: set.phaseGroup.displayIdentifier,
+		phaseGroup: set.phaseGroup,
 		entrantA: slotToUpcomingSetEntrant(slotA),
 		entrantB: slotToUpcomingSetEntrant(slotB),
 	};

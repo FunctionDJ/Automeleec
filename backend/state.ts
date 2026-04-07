@@ -1,5 +1,6 @@
 import { type } from "arktype";
 import { loadState } from "./load-state";
+import { PhaseGroup, SetRound } from "./startgg-import/startgg-schemas";
 
 export const PlayerInCurrentSet = type({
 	startggParticipantId: "number|null",
@@ -41,8 +42,10 @@ const SetState = type(
 
 export const CurrentSet = type({
 	startggSetId: "number",
+	round: SetRound,
+	fullRoundText: "string",
 	state: SetState,
-	phaseGroupDisplayIdentifier: "string|null",
+	phaseGroup: PhaseGroup,
 	// we need to allow string here because state gets serialized to JSON for file storage
 	// (network/tRPC transmission is handled by superjson)
 	startedAt: type("string|Date|null").pipe((value) =>
@@ -60,8 +63,10 @@ export const EntrantInUpcomingSet = type({
 
 export const UpcomingSet = type({
 	startggSetId: "number",
+	round: SetRound,
+	fullRoundText: "string",
 	state: SetState,
-	phaseGroupDisplayIdentifier: "string|null",
+	phaseGroup: PhaseGroup,
 	entrantA: EntrantInUpcomingSet,
 	entrantB: EntrantInUpcomingSet,
 });

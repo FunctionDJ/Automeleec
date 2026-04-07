@@ -58,31 +58,35 @@ const SetStateFromStartgg = type("number").pipe((value) => {
 	}
 });
 
+export const PhaseGroup = type({
+	displayIdentifier: "string",
+	/** we actually only care about DOUBLE_ELIMINATION and ROUND_ROBIN for pools */
+	bracketType: type.or(
+		"'SINGLE_ELIMINATION'",
+		"'DOUBLE_ELIMINATION'",
+		"'ROUND_ROBIN'",
+		"'SWISS'",
+		"'EXHIBITION'",
+		"'CUSTOM_SCHEDULE'",
+		"'MATCHMAKING'",
+		"'ELIMINATION_ROUNDS'",
+		"'RACE'",
+		"'CIRCUIT'",
+	),
+});
+
+/** negative = losers side */
+export const SetRound = type("number.integer");
+
 export const SetType = type({
 	id: "number",
-	/** negative = losers side */
-	round: "number.integer",
+	round: SetRound,
+	fullRoundText: "string",
 	station: {
 		number: "number",
 	},
 	slots: Slot.array(),
-	phaseGroup: {
-		displayIdentifier: "string",
-		numRounds: "number.integer|null",
-		/** we actually only care about DOUBLE_ELIMINATION and ROUND_ROBIN for pools */
-		bracketType: type.or(
-			"'SINGLE_ELIMINATION'",
-			"'DOUBLE_ELIMINATION'",
-			"'ROUND_ROBIN'",
-			"'SWISS'",
-			"'EXHIBITION'",
-			"'CUSTOM_SCHEDULE'",
-			"'MATCHMAKING'",
-			"'ELIMINATION_ROUNDS'",
-			"'RACE'",
-			"'CIRCUIT'",
-		),
-	},
+	phaseGroup: PhaseGroup,
 	state: SetStateFromStartgg,
 	startedAt: type("number | null").pipe((value) =>
 		value === null ? null : new Date(value * 1000),
