@@ -6,9 +6,6 @@ export const findPlayerInSlippiSettings = (
 	settings: GameStartType,
 	ports: typeof Ports.infer,
 ) => {
-	const portNumber = ports.findIndex(
-		(port) => port === player.startggParticipantId,
-	);
-
+	const portNumber = ports.indexOf(player.startggParticipantId);
 	return settings.players.find((p) => p.port === portNumber) ?? null;
 };

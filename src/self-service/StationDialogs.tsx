@@ -8,7 +8,7 @@ import {
 	DialogTitle,
 } from "@mui/material";
 import type { CurrentSet, Ports } from "../../backend/state";
-import { entrantLabel } from "../../shared/entrant-utils";
+import { entrantLabel } from "../../shared/entrant-utilities";
 import { PortsDialog } from "./PortsDialog";
 import { ResetDialog } from "./ResetDialog";
 

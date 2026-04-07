@@ -62,7 +62,7 @@ export function DashboardSettingsControl({
 
 		if (
 			state.startggTournamentId !== null &&
-			!window.confirm(
+			!globalThis.confirm(
 				"This will replace the current start.gg tournament and reset tracked stream queue. Continue?",
 			)
 		) {
@@ -76,7 +76,7 @@ export function DashboardSettingsControl({
 		if (
 			state.startggStreamQueueIdToTrack !== null &&
 			state.startggStreamQueueIdToTrack !== queueId &&
-			!window.confirm(
+			!globalThis.confirm(
 				"This will replace the currently tracked stream queue. Continue?",
 			)
 		) {
@@ -122,7 +122,7 @@ export function DashboardSettingsControl({
 							size="small"
 							className="grow"
 							value={tournamentSlug}
-							onChange={(e) => setTournamentSlug(e.target.value)}
+							onChange={(event) => setTournamentSlug(event.target.value)}
 							disabled={setTournamentMutation.isPending}
 						/>
 						<Button
@@ -146,7 +146,7 @@ export function DashboardSettingsControl({
 								setStreamQueueMutation.isPending
 							}
 							value={state.startggStreamQueueIdToTrack}
-							onChange={(e) => selectStreamQueue(e.target.value)}
+							onChange={(event) => selectStreamQueue(event.target.value)}
 						>
 							{streamQueues?.map((queue) => (
 								<MenuItem key={queue.id} value={queue.id}>

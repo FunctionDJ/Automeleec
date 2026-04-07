@@ -19,6 +19,8 @@ export const TrpcErrorNotifications = () => {
 		() => tRPCErrorRecord,
 	);
 
+	const path = record?.path ?? null;
+
 	return (
 		<Snackbar open={record !== null}>
 			<Alert
@@ -27,14 +29,14 @@ export const TrpcErrorNotifications = () => {
 				variant="filled"
 				onClose={clearTrpcErrors}
 			>
-				{record?.path != null ? (
-					<>
-						{record.path}:
-						<br />
-						{record.summary}
-					</>
-				) : (
+				{path === null ? (
 					record?.summary
+				) : (
+					<>
+						{path}:
+						<br />
+						{record?.summary}
+					</>
 				)}
 			</Alert>
 		</Snackbar>

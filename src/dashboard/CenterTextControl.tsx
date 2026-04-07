@@ -18,9 +18,9 @@ export function CenterTextControl({ value }: { value: string }) {
 			label="Overlay Center Text"
 			size="small"
 			value={input}
-			onChange={(e) => {
-				setInput(e.target.value);
-				submit(e.target.value);
+			onChange={(event) => {
+				setInput(event.target.value);
+				submit(event.target.value);
 			}}
 		/>
 	);

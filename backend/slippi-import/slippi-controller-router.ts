@@ -1,120 +1,27 @@
 import {
-	ConnectionEvent,
-	ConnectionStatus,
-	ConsoleConnection,
-	SlpParser,
 	SlpParserEvent,
-	SlpStream,
-	SlpStreamEvent,
 	type GameEndType,
 	type GameStartType,
 } from "@slippi/slippi-js/node";
 import { TRPCError } from "@trpc/server";
 import { type } from "arktype";
-import { startReplayWriter } from "../replay-export/replay-export";
 import { reportBracketSetBySlippiData } from "../startgg-export/report-bracket-set-by-slippi-data";
-import { globalState, updateStationSync, type Station } from "../state";
+import { globalState } from "../state";
 import { stationProcedure } from "../station-procedure";
 import { router } from "../trpc-server";
+import { createSlippiConnectionSet } from "./create-slippi-connectionset";
 import { updateStateOnSettingsEvent } from "./update-state-on-settings-event";
-
-// TODO maybe we should just use ConnectionStatus directly for state instead of having to do mapping
-
-const statusMap = {
-	[ConnectionStatus.CONNECTING]: "connecting",
-	[ConnectionStatus.CONNECTED]: "connected",
-	[ConnectionStatus.DISCONNECTED]: "disconnected",
-	[ConnectionStatus.RECONNECT_WAIT]: "reconnect-wait",
-} satisfies Record<
-	ConnectionStatus,
-	typeof Station.infer.slippi.slippiState.status
->;
-
-const createSlippiConnectionSet = (stationNumber: number) => {
-	const conn = new ConsoleConnection({ autoReconnect: true });
-	const stream = new SlpStream();
-	const parser = new SlpParser();
-
-	conn.on(ConnectionEvent.STATUS_CHANGE, (newSlippiStatus) => {
-		const newStationSlippiStatus = statusMap[newSlippiStatus];
-
-		console.log(
-			`[SlippiController] [Station ${stationNumber} at ${conn.getSettings().ipAddress}:${conn.getSettings().port}] New status: ${newStationSlippiStatus}`,
-		);
-
-		updateStationSync(stationNumber, (station) => {
-			if (newStationSlippiStatus === "connected") {
-				station.slippi.slippiState = {
-					status: "connected",
-					consoleNick: conn.getDetails().consoleNick,
-					version: conn.getDetails().version,
-				};
-			} else {
-				station.slippi.slippiState = { status: newStationSlippiStatus };
-			}
-		});
-	});
-
-	conn.on(ConnectionEvent.ERROR, (err) => {
-		console.error(
-			`[SlippiController] [Station ${stationNumber} at ${conn.getSettings().ipAddress}:${conn.getSettings().port}] Connection error:`,
-			err,
-		);
-
-		updateStationSync(stationNumber, (station) => {
-			station.slippi.slippiState = {
-				status: "error",
-				errorMessage: "Connection error: " + String(err),
-			};
-		});
-	});
-
-	conn.on(ConnectionEvent.DATA, (data) => stream.process(data));
-
-	stream.on(SlpStreamEvent.COMMAND, ({ command, payload }) =>
-		parser.handleCommand(command, payload),
-	);
-
-	startReplayWriter(stream, stationNumber).catch((err: unknown) => {
-		console.error(
-			`[SlippiController] [Station ${stationNumber} at ${conn.getSettings().ipAddress}:${conn.getSettings().port}] ReplayWriter error:`,
-			err,
-		);
-	});
-
-	return {
-		conn,
-		stream,
-		parser,
-		/**
-		 * the following two are function references that we need to store
-		 * so that we can unregister them when registering new ones
-		 * when the connection is stopped/started.
-		 */
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		parserSettingsListenerReference: (_settings: GameStartType) => {
-			/* empty */
-		},
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		parserEndListenerReference: (_gameEnd: GameEndType) => {
-			/* empty */
-		},
-	};
-};
 
 /** maps from stationNumber to connectionSets */
 const slippiConnectionSets: Record<
 	number,
 	ReturnType<typeof createSlippiConnectionSet>
-> = globalState.stations.reduce(
-	(acc, station) => ({
-		...acc,
-		[station.startggStationNumber]: createSlippiConnectionSet(
-			station.startggStationNumber,
-		),
-	}),
-	{},
-);
+> = {};
+
+for (const station of globalState.stations) {
+	slippiConnectionSets[station.startggStationNumber] =
+		createSlippiConnectionSet(station.startggStationNumber);
+}
 
 const inactiveStationProcedure = stationProcedure.use(({ ctx, next }) => {
 	if (
@@ -199,8 +106,8 @@ export const slippiRouter = router({
 				stationNumber: ctx.station.startggStationNumber,
 				gameEnd,
 			})
-				.catch((err: unknown) => {
-					console.error(`${logPrefix} Failed to report set:`, err);
+				.catch((error: unknown) => {
+					console.error(`${logPrefix} Failed to report set:`, error);
 				})
 				.finally(() => {
 					// parser.reset() is necessary for SlpParserEvent.SETTINGS to be emitted again

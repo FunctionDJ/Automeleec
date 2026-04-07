@@ -46,10 +46,10 @@ export function OverrideControls({
 					label="Entrant A Tag"
 					size="small"
 					value={a.player1.tag}
-					onChange={(e) =>
+					onChange={(event) =>
 						setA({
 							...a,
-							player1: { ...a.player1, tag: e.target.value },
+							player1: { ...a.player1, tag: event.target.value },
 						})
 					}
 				/>
@@ -59,10 +59,11 @@ export function OverrideControls({
 					type="number"
 					className="w-24"
 					value={a.score ?? ""}
-					onChange={(e) =>
+					onChange={(event) =>
 						setA({
 							...a,
-							score: e.target.value === "" ? null : Number(e.target.value),
+							score:
+								event.target.value === "" ? null : Number(event.target.value),
 						})
 					}
 				/>
@@ -70,10 +71,10 @@ export function OverrideControls({
 					label="Entrant B Tag"
 					size="small"
 					value={b.player1.tag}
-					onChange={(e) =>
+					onChange={(event) =>
 						setB({
 							...b,
-							player1: { ...b.player1, tag: e.target.value },
+							player1: { ...b.player1, tag: event.target.value },
 						})
 					}
 				/>
@@ -83,10 +84,11 @@ export function OverrideControls({
 					type="number"
 					className="w-24"
 					value={b.score ?? ""}
-					onChange={(e) =>
+					onChange={(event) =>
 						setB({
 							...b,
-							score: e.target.value === "" ? null : Number(e.target.value),
+							score:
+								event.target.value === "" ? null : Number(event.target.value),
 						})
 					}
 				/>

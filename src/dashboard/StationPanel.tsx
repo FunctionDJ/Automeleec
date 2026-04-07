@@ -29,7 +29,8 @@ export function StationPanel({ station }: { station: typeof Station.infer }) {
 		trpc.dashboard.setBestOf.mutationOptions(),
 	);
 	const submitBestOf = useDebouncedCallback(
-		(val: number) => bestOfMutation.mutate({ stationNumber: n, bestOf: val }),
+		(value: number) =>
+			bestOfMutation.mutate({ stationNumber: n, bestOf: value }),
 		500,
 	);
 
@@ -64,10 +65,10 @@ export function StationPanel({ station }: { station: typeof Station.infer }) {
 								size="small"
 								className="w-24"
 								value={bestOf}
-								onChange={(e) => {
-									const val = Number(e.target.value);
-									setBestOf(val);
-									submitBestOf(val);
+								onChange={(event) => {
+									const value = Number(event.target.value);
+									setBestOf(value);
+									submitBestOf(value);
 								}}
 								slotProps={{ htmlInput: { min: 1, step: 2 } }}
 							/>
@@ -81,10 +82,10 @@ export function StationPanel({ station }: { station: typeof Station.infer }) {
 								<InputLabel>Data Mode</InputLabel>
 								<Select
 									value={station.mode}
-									onChange={(e) =>
+									onChange={(event) =>
 										modeMutation.mutate({
 											stationNumber: n,
-											mode: e.target.value,
+											mode: event.target.value,
 										})
 									}
 									sx={{
@@ -116,9 +117,9 @@ export function StationPanel({ station }: { station: typeof Station.infer }) {
 							size="small"
 							className="grow"
 							value={basicText}
-							onChange={(e) => {
-								setBasicText(e.target.value);
-								submitBasicText(e.target.value);
+							onChange={(event) => {
+								setBasicText(event.target.value);
+								submitBasicText(event.target.value);
 							}}
 						/>
 					)}

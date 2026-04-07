@@ -6,7 +6,7 @@ import {
 	slippiCharacterToStartGGCharacter,
 	slippiStageToStartGGStageId,
 } from "./slippi-to-startgg";
-import { getPlayersFromCurrentSet } from "../../shared/entrant-utils";
+import { getPlayersFromCurrentSet } from "../../shared/entrant-utilities";
 
 export const reportBracketSetBySlippiData = async ({
 	gameEnd,

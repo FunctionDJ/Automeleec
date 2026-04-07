@@ -9,20 +9,20 @@ export const loadState = async (): Promise<typeof State.infer> => {
 		const json = (await stateFile.json()) as unknown;
 		const stateValidateResult = State(json);
 
-		if (!(stateValidateResult instanceof type.errors)) {
-			console.log(logPrefix, "loaded state.json");
-
-			stateValidateResult.stations.forEach((station) => {
-				station.slippi.slippiState.status = "disconnected";
-			});
-
-			return stateValidateResult;
-		} else {
+		if (stateValidateResult instanceof type.errors) {
 			console.error(
 				logPrefix,
 				"state file is invalid:",
 				stateValidateResult.summary,
 			);
+		} else {
+			console.log(logPrefix, "loaded state.json");
+
+			for (const station of stateValidateResult.stations) {
+				station.slippi.slippiState.status = "disconnected";
+			}
+
+			return stateValidateResult;
 		}
 	}
 

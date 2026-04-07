@@ -12,7 +12,7 @@ import type { CurrentSet, Ports } from "../../backend/state";
 import {
 	entrantLabel,
 	getPlayersFromCurrentSet,
-} from "../../shared/entrant-utils";
+} from "../../shared/entrant-utilities";
 import { trpcVanilla } from "../trpc-client";
 import { PortInput } from "./PortInput";
 
@@ -63,9 +63,9 @@ export const PortsDialog = ({
 	return (
 		<Dialog open={open} onClose={onClose}>
 			<DialogTitle>
-				{currentSet.state !== "active"
-					? "Starting set "
-					: "Updating ports for "}
+				{currentSet.state === "active"
+					? "Updating ports for "
+					: "Starting set "}
 				{entrantLabel(currentSet.entrantA)} vs.{" "}
 				{entrantLabel(currentSet.entrantB)}
 			</DialogTitle>
@@ -85,12 +85,12 @@ export const PortsDialog = ({
 					onClick={() => {
 						updatePortsMutation.mutate(undefined, {
 							onSuccess: () => {
-								if (currentSet.state !== "active") {
+								if (currentSet.state === "active") {
+									onClose();
+								} else {
 									startSetMutation.mutate(undefined, {
 										onSuccess: () => onClose(),
 									});
-								} else {
-									onClose();
 								}
 							},
 						});

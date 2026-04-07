@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import type { CurrentSet } from "../../backend/state";
-import { entrantLabel } from "../../shared/entrant-utils";
+import { entrantLabel } from "../../shared/entrant-utilities";
 import { trpcVanilla } from "../trpc-client";
 
 interface Props {

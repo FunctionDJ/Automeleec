@@ -17,13 +17,10 @@ export const PortInput = ({ player, portsInput, setPortsInput }: Props) => (
 				{[1, 2, 3, 4, null].map((radioValue) => {
 					const foundIndex = portsInput.indexOf(player.startggParticipantId);
 
-					let checked = false;
-
-					if (radioValue === null) {
-						checked = foundIndex === -1;
-					} else {
-						checked = foundIndex === radioValue - 1;
-					}
+					const checked =
+						radioValue === null
+							? foundIndex === -1
+							: foundIndex === radioValue - 1;
 
 					return (
 						<Radio

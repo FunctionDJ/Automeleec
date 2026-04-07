@@ -29,24 +29,32 @@ export const Slot = type({
 	},
 });
 
-const SetStateFromStartgg = type("number").pipe((val) => {
-	switch (val) {
-		case 1:
+const SetStateFromStartgg = type("number").pipe((value) => {
+	switch (value) {
+		case 1: {
 			return "created";
-		case 2:
+		}
+		case 2: {
 			return "active";
-		case 3:
+		}
+		case 3: {
 			return "completed";
-		case 4:
+		}
+		case 4: {
 			return "ready";
-		case 5:
+		}
+		case 5: {
 			return "invalid";
-		case 6:
+		}
+		case 6: {
 			return "called";
-		case 7:
+		}
+		case 7: {
 			return "queued";
-		default:
+		}
+		default: {
 			return "unknown";
+		}
 	}
 });
 
@@ -60,7 +68,7 @@ export const SetType = type({
 	slots: Slot.array(),
 	phaseGroup: {
 		displayIdentifier: "string",
-		numRounds: "number.integer",
+		numRounds: "number.integer|null",
 		/** we actually only care about DOUBLE_ELIMINATION and ROUND_ROBIN for pools */
 		bracketType: type.or(
 			"'SINGLE_ELIMINATION'",
@@ -76,7 +84,7 @@ export const SetType = type({
 		),
 	},
 	state: SetStateFromStartgg,
-	startedAt: type("number | null").pipe((val) =>
-		val === null ? null : new Date(val * 1000),
+	startedAt: type("number | null").pipe((value) =>
+		value === null ? null : new Date(value * 1000),
 	),
 });

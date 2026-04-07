@@ -163,7 +163,7 @@ export const getNewStationByStreamQueueSets = (
 
 	stationClone.upcomingSets = sggSetsAtThisStation
 		.filter((set) => set.id !== stationClone.currentSet?.startggSetId)
-		.map(setToUpcomingSet);
+		.map((set) => setToUpcomingSet(set));
 
 	return stationClone;
 };

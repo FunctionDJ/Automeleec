@@ -9,6 +9,6 @@ export const entrantLabel = (entrant: {
 		: entrant.player1.tag;
 
 export const getPlayersFromCurrentSet = (currentSet: typeof CurrentSet.infer) =>
-	[currentSet.entrantA, currentSet.entrantB].flatMap((e) =>
-		e.player2 ? [e.player1, e.player2] : [e.player1],
+	[currentSet.entrantA, currentSet.entrantB].flatMap((event) =>
+		event.player2 ? [event.player1, event.player2] : [event.player1],
 	);

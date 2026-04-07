@@ -1,6 +1,6 @@
 import { Chip, Typography } from "@mui/material";
 import type { CurrentSet } from "../../backend/state";
-import { entrantLabel } from "../../shared/entrant-utils";
+import { entrantLabel } from "../../shared/entrant-utilities";
 
 export function CurrentSetDisplay({
 	currentSet,

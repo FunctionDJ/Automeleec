@@ -44,6 +44,8 @@ export default defineConfig([
 				// allow "Props" for react props interfaces
 				{ allowList: { Props: true } },
 			],
+			// dont enforce separators because of e.g. port numbers where it would be silly
+			"unicorn/numeric-separators-style": "off",
 			"@typescript-eslint/strict-boolean-expressions": "error",
 			"@typescript-eslint/consistent-return": "error",
 			"@typescript-eslint/consistent-type-imports": "error",
@@ -71,11 +73,14 @@ export default defineConfig([
 	// force PascalCase for .tsx
 	{
 		files: ["**/*.tsx"],
+		// common-main*.tsx are an exception because they're the only files that use JSX but aren't components
+		ignores: ["src/common-main*.tsx"],
 		rules: {
-			// "unicorn/filename-case": ["error", { case: "pascalCase" }],
+			"unicorn/filename-case": ["error", { case: "pascalCase" }],
 		},
 	},
 	{
+		// TODO replace all console calls with standardized logger functions and remove this rule
 		files: ["backend/**/*.ts"],
 		rules: {
 			"ban-console-without-prefix/ban-console-without-prefix": ["error"],

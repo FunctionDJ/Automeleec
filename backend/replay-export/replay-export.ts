@@ -30,9 +30,9 @@ export const startReplayWriter = async (
 	const logPrefix = `[ReplayWriter] [Station ${stationNumber}]`;
 	console.log(`${logPrefix} Initializing...`);
 
-	const tempFile = `./replays/Station_${stationNumber}_temp.slp`;
+	const temporaryFile = `./replays/Station_${stationNumber}_temp.slp`;
 
-	if (await Bun.file(tempFile).exists()) {
+	if (await Bun.file(temporaryFile).exists()) {
 		throw new Error(
 			`${logPrefix} Temporary replay file already exist (wasn't cleaned up). Aborting Replay Writer and throwing error.`,
 		);

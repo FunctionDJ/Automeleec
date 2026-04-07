@@ -97,10 +97,10 @@ const fetchStartGGAndUpdateState = async () => {
 void fetchStartGGAndUpdateState();
 
 setInterval(() => {
-	fetchStartGGAndUpdateState().catch((err: unknown) => {
+	fetchStartGGAndUpdateState().catch((error: unknown) => {
 		console.error(
 			"[StartggImport] Error fetching or JSON-parsing start.gg data (skipping state update):",
-			err,
+			error,
 		);
 	});
 }, 5000);

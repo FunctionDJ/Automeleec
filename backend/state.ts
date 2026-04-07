@@ -1,5 +1,4 @@
 import { type } from "arktype";
-import { EventEmitter } from "node:events";
 import { loadState } from "./load-state";
 
 export const PlayerInCurrentSet = type({
@@ -46,8 +45,8 @@ export const CurrentSet = type({
 	phaseGroupDisplayIdentifier: "string|null",
 	// we need to allow string here because state gets serialized to JSON for file storage
 	// (network/tRPC transmission is handled by superjson)
-	startedAt: type("string|Date|null").pipe((val) =>
-		val === null ? null : new Date(val),
+	startedAt: type("string|Date|null").pipe((value) =>
+		value === null ? null : new Date(value),
 	),
 	entrantA: EntrantInCurrentSet,
 	entrantB: EntrantInCurrentSet,
@@ -120,7 +119,7 @@ export const State = type({
 
 export const globalState = await loadState();
 
-export const emitter = new EventEmitter();
+export const emitter = new EventTarget();
 
 export const updateStateSync = (
 	updater: (state: typeof State.infer) => void,
@@ -130,7 +129,7 @@ export const updateStateSync = (
 	const newState = JSON.stringify(globalState);
 
 	if (oldState !== newState) {
-		emitter.emit("data", globalState);
+		emitter.dispatchEvent(new CustomEvent("data", { detail: globalState }));
 		void Bun.write("state.json", new Blob([newState]));
 	}
 };
@@ -144,7 +143,7 @@ export const updateStateAsync = async <T>(
 	const newState = JSON.stringify(globalState);
 
 	if (oldState !== newState) {
-		emitter.emit("data", globalState);
+		emitter.dispatchEvent(new CustomEvent("data", { detail: globalState }));
 		void Bun.write("state.json", new Blob([newState]));
 	}
 

@@ -24,14 +24,14 @@ export const fetchStartGG = async (
 	const result = StartGGGraphQLResponse(json);
 
 	if (result instanceof type.errors) {
-		throw new Error(
+		throw new TypeError(
 			`[FetchStartGG] Invalid response: ${result.summary}\nResponse was: ${JSON.stringify(json, null, 2)}`,
 		);
 	}
 
 	if ("errors" in result) {
 		throw new Error(
-			`[FetchStartGG] GraphQL error(s): ${result.errors.map((e) => e.message).join(", ")}`,
+			`[FetchStartGG] GraphQL error(s): ${result.errors.map((error) => error.message).join(", ")}`,
 		);
 	}
 

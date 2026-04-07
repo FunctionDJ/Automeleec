@@ -9,10 +9,10 @@ export const commonMain = (
 	AppComponent: () => JSX.Element,
 	wrap?: (content: JSX.Element) => JSX.Element,
 ) => {
-	const root = document.getElementById("root");
+	const root = document.querySelector("#root");
 
 	if (!root) {
-		window.alert("Root element not found");
+		globalThis.alert("Root element not found");
 		return;
 	}
 

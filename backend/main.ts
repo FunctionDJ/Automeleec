@@ -5,9 +5,9 @@ import { appRouter } from "./router";
 import "./startgg-import/sapfpresse-updater";
 
 const PORT =
-	Bun.env.PORT !== undefined ? Number.parseInt(Bun.env.PORT, 10) : 3000;
+	Bun.env.PORT === undefined ? 3000 : Number.parseInt(Bun.env.PORT, 10);
 
-const isDev = Bun.env.NODE_ENV !== "production";
+const isDevelopment = Bun.env.NODE_ENV !== "production";
 
 const trpcHandler = createHTTPHandler({
 	router: appRouter,
@@ -17,17 +17,17 @@ const trpcHandler = createHTTPHandler({
 const vite: ViteDevServer = await createViteServer({
 	server: {
 		middlewareMode: true,
-		hmr: isDev,
+		hmr: isDevelopment,
 	},
-	mode: isDev ? "development" : "production",
+	mode: isDevelopment ? "development" : "production",
 });
 
-const server = createServer((req, res) => {
-	if (req.url !== undefined && req.url.startsWith("/trpc/")) {
-		return trpcHandler(req, res);
+const server = createServer((request, response) => {
+	if (request.url !== undefined && request.url.startsWith("/trpc/")) {
+		return trpcHandler(request, response);
 	}
 
-	return vite.middlewares(req, res);
+	return vite.middlewares(request, response);
 });
 
 server.listen(PORT, () => {

@@ -21,7 +21,7 @@ import {
 import { green, purple } from "@mui/material/colors";
 import { useState } from "react";
 import type { Station } from "../../backend/state";
-import { mainThemeConfig } from "./mainTheme";
+import { mainThemeConfig } from "./main-theme";
 import { RunningSetRow } from "./RunningSetRow";
 import { StationDialogs } from "./StationDialogs";
 import { Timer } from "./Timer";
@@ -40,11 +40,27 @@ const stationTheme = createTheme({
 	},
 });
 
+const getCardBackgroundColor = (
+	currentSet: typeof Station.infer.currentSet,
+) => {
+	if (!currentSet) {
+		return "grey.900";
+	}
+
+	if (currentSet.state === "active") {
+		return purple[800];
+	}
+
+	return green[600];
+};
+
 export const StationComponent = ({ station }: Props) => {
 	const [hwDialogOpen, setHwDialogOpen] = useState(false);
 	const [portDialogOpen, setPortDialogOpen] = useState(false);
 	const [resetDialogOpen, setResetDialogOpen] = useState(false);
 	const { currentSet } = station;
+
+	const cardBackground = getCardBackgroundColor(currentSet);
 
 	return (
 		<div>
@@ -63,15 +79,7 @@ export const StationComponent = ({ station }: Props) => {
 			)}
 			<ThemeProvider theme={stationTheme}>
 				<Card sx={{ bgcolor: "grey.900" }}>
-					<CardContent
-						sx={{
-							bgcolor: currentSet
-								? currentSet.state === "active"
-									? purple[800]
-									: green[600]
-								: undefined,
-						}}
-					>
+					<CardContent sx={{ bgcolor: cardBackground }}>
 						<Typography>Station {station.startggStationNumber}</Typography>
 						<div>
 							{currentSet ? (

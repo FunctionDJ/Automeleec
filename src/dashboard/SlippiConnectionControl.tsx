@@ -1,20 +1,20 @@
 import {
-	CircularProgress,
 	Button,
+	CircularProgress,
 	IconButton,
 	Paper,
 	Popover,
 	TextField,
 	Tooltip,
-	Typography,
 } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
+import { type } from "arktype";
 import { useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
-import { type } from "arktype";
 import type { Station } from "../../backend/state";
 import { trpc } from "../trpc-client";
 import slippiLogo from "./SlippiLogo.svg";
+import { SlippiStatusText } from "./SlippiStatusText";
 
 export function SlippiConnectionControl({
 	station,
@@ -23,9 +23,8 @@ export function SlippiConnectionControl({
 }) {
 	const n = station.startggStationNumber;
 
-	const [slippiAnchorEl, setSlippiAnchorEl] = useState<HTMLElement | null>(
-		null,
-	);
+	const [slippiAnchorElement, setSlippiAnchorElement] =
+		useState<HTMLElement | null>(null);
 	const [editIp, setEditIp] = useState(station.slippi.ip);
 	const [editPort, setEditPort] = useState(station.slippi.port);
 
@@ -69,18 +68,12 @@ export function SlippiConnectionControl({
 						: ""
 				}
 			>
-				<Typography variant="body2" color="textSecondary">
-					{station.slippi.slippiState.status === "error"
-						? "error (hover for details)"
-						: station.slippi.slippiState.status === "connected"
-							? `connected: ${station.slippi.slippiState.consoleNick}, v${station.slippi.slippiState.version}`
-							: station.slippi.slippiState.status}
-				</Typography>
+				<SlippiStatusText slippiState={station.slippi.slippiState} />
 			</Tooltip>
 			<Tooltip title="Open Slippi Connection Management">
 				<IconButton
-					onClick={(e) => {
-						setSlippiAnchorEl(e.currentTarget);
+					onClick={(event) => {
+						setSlippiAnchorElement(event.currentTarget);
 					}}
 					sx={{
 						position: "relative",
@@ -109,9 +102,9 @@ export function SlippiConnectionControl({
 			</Tooltip>
 
 			<Popover
-				open={slippiAnchorEl !== null}
-				anchorEl={slippiAnchorEl}
-				onClose={() => setSlippiAnchorEl(null)}
+				open={slippiAnchorElement !== null}
+				anchorEl={slippiAnchorElement}
+				onClose={() => setSlippiAnchorElement(null)}
 				anchorOrigin={{
 					vertical: "bottom",
 					horizontal: "center",
@@ -126,25 +119,25 @@ export function SlippiConnectionControl({
 						label="IP Address"
 						value={editIp}
 						disabled={!isInactive}
-						onChange={(e) => {
-							if (/[^0-9.]/.test(e.target.value)) {
+						onChange={(event) => {
+							if (/[^0-9.]/.test(event.target.value)) {
 								return;
 							}
 
-							setEditIp(e.target.value);
-							submitSlippiIp(e.target.value);
+							setEditIp(event.target.value);
+							submitSlippiIp(event.target.value);
 						}}
 					/>
 					<TextField
 						label="Port"
 						value={editPort}
 						disabled={!isInactive}
-						onChange={(e) => {
-							if (/\D/.test(e.target.value)) {
+						onChange={(event) => {
+							if (/\D/.test(event.target.value)) {
 								return;
 							}
 
-							const port = Number.parseInt(e.target.value, 10);
+							const port = Number.parseInt(event.target.value, 10);
 							setEditPort(port);
 							submitSlippiPort(port);
 						}}
@@ -157,7 +150,7 @@ export function SlippiConnectionControl({
 								disabled={startConnectionMutation.isPending || !canConnect}
 								onClick={() => {
 									startConnectionMutation.mutate({ stationNumber: n });
-									setSlippiAnchorEl(null);
+									setSlippiAnchorElement(null);
 								}}
 							>
 								Connect
@@ -169,7 +162,7 @@ export function SlippiConnectionControl({
 									disabled={resetErrorMutation.isPending}
 									onClick={() => {
 										resetErrorMutation.mutate({ stationNumber: n });
-										setSlippiAnchorEl(null);
+										setSlippiAnchorElement(null);
 									}}
 								>
 									Reset Error
@@ -182,7 +175,7 @@ export function SlippiConnectionControl({
 							color="error"
 							disabled={stopConnectionMutation.isPending}
 							onClick={() => {
-								const confirmDisconnect = window.confirm(
+								const confirmDisconnect = globalThis.confirm(
 									`Disconnect station ${n} from Slippi?`,
 								);
 
@@ -191,7 +184,7 @@ export function SlippiConnectionControl({
 								}
 
 								stopConnectionMutation.mutate({ stationNumber: n });
-								setSlippiAnchorEl(null);
+								setSlippiAnchorElement(null);
 							}}
 						>
 							Disconnect

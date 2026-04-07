@@ -8,7 +8,7 @@ import {
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import type { PlayerInCurrentSet, Ports, Station } from "../../backend/state";
-import { getPlayersFromCurrentSet } from "../../shared/entrant-utils";
+import { getPlayersFromCurrentSet } from "../../shared/entrant-utilities";
 import { trpc } from "../trpc-client";
 
 export function PortsControl({ station }: { station: typeof Station.infer }) {
@@ -68,17 +68,17 @@ export function PortsControl({ station }: { station: typeof Station.infer }) {
 				)}
 			</div>
 			<div className="flex gap-2">
-				{([0, 1, 2, 3] as const).map((i) => (
-					<FormControl key={i} size="small" className="min-w-28">
-						<InputLabel>Port {i + 1}</InputLabel>
+				{([0, 1, 2, 3] as const).map((stationNumber) => (
+					<FormControl key={stationNumber} size="small" className="min-w-28">
+						<InputLabel>Port {stationNumber + 1}</InputLabel>
 						<Select
 							className="w-30"
-							label={`Port ${i + 1}`}
-							value={input[i] ?? ""}
-							onChange={(e) => {
-								const val = e.target.value as number | "";
+							label={`Port ${stationNumber + 1}`}
+							value={input[stationNumber] ?? ""}
+							onChange={(event) => {
+								const value = event.target.value as number | "";
 								const next = [...input] as typeof Ports.infer;
-								next[i] = val === "" ? null : val;
+								next[stationNumber] = value === "" ? null : value;
 								setInput(next);
 								const nextAssigned = next.filter(
 									(id): id is number => id !== null,
@@ -91,7 +91,7 @@ export function PortsControl({ station }: { station: typeof Station.infer }) {
 							<MenuItem value="">
 								<em>None</em>
 							</MenuItem>
-							{availableForPort(i, players).map((p) => (
+							{availableForPort(stationNumber, players).map((p) => (
 								<MenuItem
 									key={p.startggParticipantId}
 									value={p.startggParticipantId ?? undefined}
