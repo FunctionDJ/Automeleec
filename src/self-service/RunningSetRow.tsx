@@ -1,8 +1,8 @@
 import { TableCell, TableRow, Typography } from "@mui/material";
-import type { EntrantInCurrentSet } from "../../backend/state";
+import type { EntrantInActiveStartGGSet } from "../../backend/state";
 
 interface Props {
-	entrant: typeof EntrantInCurrentSet.infer | undefined;
+	entrant: typeof EntrantInActiveStartGGSet.infer | undefined;
 }
 
 export const RunningSetRow = ({ entrant }: Props) => (

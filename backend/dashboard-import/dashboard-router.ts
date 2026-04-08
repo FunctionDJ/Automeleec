@@ -2,7 +2,7 @@ import { type } from "arktype";
 import { slippiRouter } from "../slippi-import/slippi-controller-router";
 import {
 	Mode,
-	OverrideEntrant,
+	EntrantInActiveSet,
 	Ports,
 	globalState as globalState,
 	updateStateSync,
@@ -25,13 +25,22 @@ export const dashboardRouter = router({
 					}`);
 
 			const validatedData = type({
-				tournament: {
+				tournament: type({
 					id: "number.integer",
-				},
+				}).or("null"),
 			}).assert(response);
 
+			const { tournament } = validatedData;
+
+			if (tournament === null) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: `Tournament with slug ${input.startggTournamentSlug} not found`,
+				});
+			}
+
 			updateStateSync((state) => {
-				state.startggTournamentId = validatedData.tournament.id;
+				state.startggTournamentId = tournament.id;
 				state.startggTournamentSlug = input.startggTournamentSlug;
 				state.startggStreamQueueIdToTrack = null;
 			});
@@ -107,10 +116,13 @@ export const dashboardRouter = router({
 			ctx.station.ports = input.ports;
 		}),
 	setEntrantOverride: stationProcedure
-		.input(type({ side: "'left'|'right'", entrantOverride: OverrideEntrant }))
+		.input(
+			type({ side: "'left'|'right'", entrantOverride: EntrantInActiveSet }),
+		)
 		.mutation(({ input, ctx }) => {
-			ctx.station.entrantOverride[input.side === "left" ? 0 : 1] =
-				input.entrantOverride;
+			ctx.station.entrantOverride[
+				input.side === "left" ? "entrantA" : "entrantB"
+			] = input.entrantOverride;
 		}),
 	setBasicTextOverride: stationProcedure
 		.input(type({ basicTextOverride: "string" }))

@@ -1,6 +1,6 @@
 import { type } from "arktype";
 import { State, type Station } from "./state";
-import { prefixLogger } from "./logger/logger";
+import { prefixLogger } from "./logger";
 
 export const loadState = async (): Promise<typeof State.infer> => {
 	const logger = prefixLogger("LoadState");
@@ -32,28 +32,26 @@ export const loadState = async (): Promise<typeof State.infer> => {
 				startggStationNumber,
 				mode: "startgg",
 				basicTextOverride: "",
-				entrantOverride: [
-					{
+				entrantOverride: {
+					entrantA: {
 						player1: {
 							tag: "",
 							pronouns: "",
 							character: null,
-							characterColor: null,
 						},
 						player2: null,
 						score: null,
 					},
-					{
+					entrantB: {
 						player1: {
 							tag: "",
 							pronouns: "",
 							character: null,
-							characterColor: null,
 						},
 						player2: null,
 						score: null,
 					},
-				],
+				},
 				currentSet: null,
 				upcomingSets: [],
 				ports: [null, null, null, null],

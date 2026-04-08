@@ -10,7 +10,7 @@ import {
 } from "@slippi/slippi-js/node";
 import { startReplayWriter } from "../replay-export/replay-export";
 import { updateStationSync, type Station } from "../state";
-import { prefixLogger } from "../logger/logger";
+import { prefixLogger } from "../logger";
 
 // [FUTURE] maybe we should just use ConnectionStatus directly for state instead of having to do mapping
 

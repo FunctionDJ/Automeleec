@@ -1,4 +1,4 @@
-import { prefixLogger } from "../logger/logger";
+import { prefixLogger } from "../logger";
 import { fetchStartGG } from "../startgg-interface/fetch-startgg";
 
 export interface Selection {

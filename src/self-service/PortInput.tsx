@@ -1,10 +1,10 @@
 import { Close } from "@mui/icons-material";
 import { DialogContentText, Radio } from "@mui/material";
 import type { Dispatch } from "react";
-import type { PlayerInCurrentSet, Ports } from "../../backend/state";
+import type { PlayerInActiveStartGGSet, Ports } from "../../backend/state";
 
 interface Props {
-	player: typeof PlayerInCurrentSet.infer;
+	player: typeof PlayerInActiveStartGGSet.infer;
 	portsInput: typeof Ports.infer;
 	setPortsInput: Dispatch<typeof Ports.infer>;
 }

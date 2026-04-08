@@ -1,44 +1,17 @@
-import { MenuItem, TextField } from "@mui/material";
+import { FormControlLabel, Paper, Switch, Typography } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
-import { characters } from "@slippi/slippi-js";
 import { useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
-import type { OverrideEntrant } from "../../backend/state";
+import type { EntrantInActiveSet } from "../../backend/state";
 import { trpc } from "../trpc-client";
+import NumberSpinner from "./NumberSpinner";
+import { PlayerOverride } from "./PlayerOverride";
 
 interface Props {
-	entrant: typeof OverrideEntrant.infer;
+	entrant: typeof EntrantInActiveSet.infer;
 	side: "left" | "right";
 	stationNumber: number;
 }
-
-const playableCharacters = characters
-	.getAllCharacters()
-	.filter((character) => character.id <= 25);
-
-const getStockIconSource = (
-	characterId: number | null,
-	colorId: number | null,
-) => {
-	if (characterId === null) {
-		return null;
-	}
-
-	const characterInfo = playableCharacters.find(
-		(character) => character.id === characterId,
-	);
-
-	if (characterInfo === undefined) {
-		return null;
-	}
-
-	const selectedColor =
-		colorId === null || colorId === 0
-			? null
-			: (characterInfo.colors[colorId] ?? null);
-
-	return `/stock-icons/${characterInfo.shortName}${selectedColor === null ? "" : `_${selectedColor}`}.png`;
-};
 
 export const EntrantOverride = ({ entrant, side, stationNumber }: Props) => {
 	const [localEntrant, setLocalEntrant] = useState(entrant);
@@ -48,7 +21,7 @@ export const EntrantOverride = ({ entrant, side, stationNumber }: Props) => {
 	);
 
 	const debounced = useDebouncedCallback(
-		(entrantParameter: typeof OverrideEntrant.infer) =>
+		(entrantParameter: typeof EntrantInActiveSet.infer) =>
 			mutate({
 				entrantOverride: entrantParameter,
 				side,
@@ -57,122 +30,94 @@ export const EntrantOverride = ({ entrant, side, stationNumber }: Props) => {
 		500,
 	);
 
-	const update = (entrantParameter: typeof OverrideEntrant.infer) => {
+	const update = (entrantParameter: typeof EntrantInActiveSet.infer) => {
 		setLocalEntrant(entrantParameter);
 		debounced(entrantParameter);
 	};
 
-	const selectedCharacter = playableCharacters.find(
-		(character) => character.id === localEntrant.player1.character,
-	);
+	const setPlayer2Enabled = (enabled: boolean) => {
+		if (enabled) {
+			update({
+				...localEntrant,
+				player2: localEntrant.player2 ?? {
+					tag: "",
+					pronouns: "",
+					character: null,
+				},
+			});
 
-	const costumeValue =
-		selectedCharacter === undefined
-			? ""
-			: (localEntrant.player1.characterColor ?? 0);
+			return;
+		}
 
-	const stockIconSource = getStockIconSource(
-		localEntrant.player1.character,
-		localEntrant.player1.characterColor,
-	);
+		update({
+			...localEntrant,
+			player2: null,
+		});
+	};
 
 	return (
-		<div className="flex flex-wrap items-center gap-2">
-			<TextField
-				label="Entrant A Tag"
-				size="small"
-				value={localEntrant.player1.tag}
-				onChange={(event) =>
-					update({
-						...localEntrant,
-						player1: { ...localEntrant.player1, tag: event.target.value },
-					})
-				}
-			/>
-			<TextField
-				label="A Score"
-				size="small"
-				type="number"
-				className="w-24"
-				value={localEntrant.score ?? ""}
-				onChange={(event) =>
-					update({
-						...localEntrant,
-						score:
-							event.target.value === "" ? null : Number(event.target.value),
-					})
-				}
-			/>
-			<TextField
-				select
-				label="Character"
-				size="small"
-				className="w-56"
-				value={localEntrant.player1.character ?? ""}
-				onChange={(event) => {
-					const characterId =
-						event.target.value === "" ? null : Number(event.target.value);
-					const nextCharacter = playableCharacters.find(
-						(character) => character.id === characterId,
-					);
-
-					update({
-						...localEntrant,
-						player1: {
-							...localEntrant.player1,
-							character: characterId,
-							characterColor:
-								nextCharacter === undefined
-									? null
-									: (localEntrant.player1.characterColor ?? 0) <
-										  nextCharacter.colors.length
-										? (localEntrant.player1.characterColor ?? 0)
-										: 0,
-						},
-					});
-				}}
-			>
-				<MenuItem value="">None</MenuItem>
-				{playableCharacters.map((character) => (
-					<MenuItem key={character.id} value={character.id}>
-						{character.name}
-					</MenuItem>
-				))}
-			</TextField>
-			<TextField
-				select
-				label="Costume"
-				size="small"
-				className="w-44"
-				disabled={selectedCharacter === undefined}
-				value={costumeValue}
-				onChange={(event) =>
-					update({
-						...localEntrant,
-						player1: {
-							...localEntrant.player1,
-							characterColor:
-								event.target.value === "" ? null : Number(event.target.value),
-						},
-					})
-				}
-			>
-				{(selectedCharacter?.colors ?? []).map((colorName, index) => (
-					<MenuItem key={colorName} value={index}>
-						{colorName}
-					</MenuItem>
-				))}
-			</TextField>
-			{stockIconSource !== null && (
-				<div className="flex items-center gap-2">
-					<img
-						className="h-8 w-8"
-						style={{ imageRendering: "pixelated" }}
-						src={stockIconSource}
-						alt={`${selectedCharacter?.name ?? "Character"} stock icon`}
-					/>
+		<Paper
+			className="flex flex-wrap items-center gap-3 py-2 px-3"
+			elevation={3}
+		>
+			<div className="flex gap-4 items-center w-full">
+				<Typography variant="subtitle1">
+					{side === "left" ? "Entrant A" : "Entrant B"}
+				</Typography>
+				<div className="grow flex justify-end gap-4">
+					<Paper className="flex gap-2 py-1 px-3">
+						<FormControlLabel
+							control={
+								<Switch
+									checked={localEntrant.player2 !== null}
+									onChange={(event) => setPlayer2Enabled(event.target.checked)}
+								/>
+							}
+							label="Enable Teams / Two Players"
+						/>
+					</Paper>
+					<Paper className="flex gap-2 py-1 px-3">
+						<FormControlLabel
+							className="mr-0!"
+							control={
+								<Switch
+									checked={localEntrant.score !== null}
+									onChange={() =>
+										update({
+											...localEntrant,
+											score: localEntrant.score === null ? 0 : null,
+										})
+									}
+								/>
+							}
+							label="Score"
+						/>
+						<NumberSpinner
+							disabled={localEntrant.score === null}
+							value={localEntrant.score}
+							onValueChange={(newValue) =>
+								update({
+									...localEntrant,
+									score: newValue,
+								})
+							}
+						/>
+					</Paper>
 				</div>
+			</div>
+			<PlayerOverride
+				label={localEntrant.player2 === null ? "" : "Player 1"}
+				player={localEntrant.player1}
+				onChange={(player1) => update({ ...localEntrant, player1 })}
+			/>
+
+			{localEntrant.player2 !== null && (
+				<PlayerOverride
+					label="Player 2"
+					player={localEntrant.player2}
+					onChange={(player2) => update({ ...localEntrant, player2 })}
+				/>
 			)}
-		</div>
+		</Paper>
 	);
 };

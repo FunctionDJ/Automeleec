@@ -30,6 +30,10 @@
 		"/^cd /home/function/git/SAPF-presse && bun typecheck$/": {
 			"approve": true,
 			"matchCommandLine": true
+		},
+		"/^bun lint$/": {
+			"approve": true,
+			"matchCommandLine": true
 		}
 	},
 	"todo-tree.general.tags": [

@@ -2,38 +2,45 @@ import { type } from "arktype";
 import { loadState } from "./load-state";
 import { PhaseGroup, SetRound } from "./startgg-import/startgg-schemas";
 
-export const PlayerInCurrentSet = type({
+export const Character = type({
+	slippiCharacterId: "number",
+	slippiCharacterColorId: "number",
+});
+
+export const Player = type({
+	tag: "string",
+	pronouns: "string",
+});
+
+export const Entrant = type({
+	player1: Player,
+	player2: Player.or("null"),
+});
+
+export const PlayerWithCharacter = Player.and({
+	character: Character.or("null"),
+});
+
+export const PlayerInActiveStartGGSet = PlayerWithCharacter.and({
 	startggParticipantId: "number|null",
-	tag: "string",
-	pronouns: "string",
-	slippiCharacterId: type("number|null"),
-	slippiCharacterColorId: type("number|null"),
 });
 
-export const PlayerInUpcomingSet = type({
-	tag: "string",
-	pronouns: "string",
-});
-
-export const EntrantInCurrentSet = type({
+export const EntrantInActiveStartGGSet = type({
 	startggEntrantId: "number",
-	player1: PlayerInCurrentSet,
-	player2: type(PlayerInCurrentSet.or("null")),
-	score: type("number|null"),
+	player1: PlayerInActiveStartGGSet,
+	player2: PlayerInActiveStartGGSet.or("null"),
+	score: "number|null",
 });
 
-const OverridePlayer = type({
-	tag: "string",
-	pronouns: "string",
-	character: type("number|null"),
-	characterColor: type("number|null"),
+export const EntrantInActiveSet = type({
+	player1: PlayerWithCharacter,
+	player2: PlayerWithCharacter.or("null"),
+	score: "number|null",
 });
 
-export const OverrideEntrant = type({
-	player1: OverridePlayer,
-	player2: type(OverridePlayer.or("null")),
-	score: type("number|null"),
-});
+export type EntrantInAnyActiveSet =
+	| typeof EntrantInActiveStartGGSet.infer
+	| typeof EntrantInActiveSet.infer;
 
 const SetState = type(
 	"'created'|'active'|'completed'|'ready'|'invalid'|'called'|'queued'|'unknown'",
@@ -50,14 +57,9 @@ export const CurrentSet = type({
 	startedAt: type("string|Date|null").pipe((value) =>
 		value === null ? null : new Date(value),
 	),
-	entrantA: EntrantInCurrentSet,
-	entrantB: EntrantInCurrentSet,
+	entrantA: EntrantInActiveStartGGSet,
+	entrantB: EntrantInActiveStartGGSet,
 	slippiStage: "number|null",
-});
-
-export const EntrantInUpcomingSet = type({
-	player1: PlayerInUpcomingSet,
-	player2: type(PlayerInUpcomingSet.or("null")),
 });
 
 export const UpcomingSet = type({
@@ -66,8 +68,8 @@ export const UpcomingSet = type({
 	fullRoundText: "string",
 	state: SetState,
 	phaseGroup: PhaseGroup,
-	entrantA: EntrantInUpcomingSet,
-	entrantB: EntrantInUpcomingSet,
+	entrantA: Entrant,
+	entrantB: Entrant,
 });
 
 /** startgg player id or null (no player) */
@@ -77,16 +79,21 @@ export const Ports = type([Port, Port, Port, Port]);
 
 export const Mode = type("'basic-text-override'|'entrant-override'|'startgg'");
 
+export const EntrantOverrides = type({
+	entrantA: EntrantInActiveSet,
+	entrantB: EntrantInActiveSet,
+});
+
 export const Station = type({
 	bestOf: "number",
 	startggStationNumber: "number",
 	mode: Mode,
 	basicTextOverride: "string",
-	entrantOverride: [OverrideEntrant, OverrideEntrant],
-	currentSet: type(CurrentSet.or("null")),
+	entrantOverride: EntrantOverrides,
+	currentSet: CurrentSet.or("null"),
 	upcomingSets: UpcomingSet.array(),
 	ports: Ports,
-	slippi: type({
+	slippi: {
 		ip: "string",
 		port: "number",
 		slippiState: type.or(
@@ -109,7 +116,7 @@ export const Station = type({
 				errorMessage: "string",
 			},
 		),
-	}),
+	},
 });
 
 export const State = type({

@@ -1,10 +1,10 @@
-import { prefixLogger } from "../logger/logger";
+import { prefixLogger } from "../logger";
 import type {
 	CurrentSet,
-	EntrantInCurrentSet,
-	EntrantInUpcomingSet,
-	PlayerInCurrentSet,
-	PlayerInUpcomingSet,
+	EntrantInActiveStartGGSet,
+	Entrant,
+	PlayerInActiveStartGGSet,
+	Player,
 	Station,
 	UpcomingSet,
 } from "../state";
@@ -12,17 +12,16 @@ import type { Participant, SetType, Slot } from "./startgg-schemas";
 
 const participantToPlayerInCurrentSet = (
 	participant: typeof Participant.infer,
-): typeof PlayerInCurrentSet.infer => ({
+): typeof PlayerInActiveStartGGSet.infer => ({
 	startggParticipantId: participant.id,
 	tag: participant.gamerTag,
 	pronouns: participant.user?.genderPronoun ?? "",
-	slippiCharacterId: null,
-	slippiCharacterColorId: null,
+	character: null,
 });
 
 const slotToCurrentSetEntrant = (
 	slot: typeof Slot.infer,
-): typeof EntrantInCurrentSet.infer => ({
+): typeof EntrantInActiveStartGGSet.infer => ({
 	startggEntrantId: slot.entrant.id,
 	score: slot.standing.stats.score.value ?? null,
 	player1: slot.entrant.participants[0]
@@ -31,8 +30,7 @@ const slotToCurrentSetEntrant = (
 				startggParticipantId: null,
 				tag: "[missing participant]",
 				pronouns: "",
-				slippiCharacterId: null,
-				slippiCharacterColorId: null,
+				character: null,
 			},
 	player2: slot.entrant.participants[1]
 		? participantToPlayerInCurrentSet(slot.entrant.participants[1])
@@ -41,14 +39,14 @@ const slotToCurrentSetEntrant = (
 
 const participantToPlayerInUpcomingSet = (
 	participant: typeof Participant.infer,
-): typeof PlayerInUpcomingSet.infer => ({
+): typeof Player.infer => ({
 	tag: participant.gamerTag,
 	pronouns: participant.user?.genderPronoun ?? "",
 });
 
 const slotToUpcomingSetEntrant = (
 	slot: typeof Slot.infer,
-): typeof EntrantInUpcomingSet.infer => ({
+): typeof Entrant.infer => ({
 	player1: slot.entrant.participants[0]
 		? participantToPlayerInUpcomingSet(slot.entrant.participants[0])
 		: {

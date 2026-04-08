@@ -1,5 +1,5 @@
 import type { GameEndType } from "@slippi/slippi-js/node";
-import { prefixLogger } from "../logger/logger";
+import { prefixLogger } from "../logger";
 import { getStationOrThrow } from "../state";
 import { fetchSetGames } from "./fetch-set-games";
 import { reportBracketSet, type Selection } from "./report-bracket-set";
@@ -90,19 +90,23 @@ export const reportBracketSetBySlippiData = async ({
 
 	const selections: Selection[] = [
 		{
-			slippiCharacterId: currentSet.entrantA.player1.slippiCharacterId,
+			slippiCharacterId:
+				currentSet.entrantA.player1.character?.slippiCharacterId ?? null,
 			entrantId: currentSet.entrantA.startggEntrantId,
 		},
 		{
-			slippiCharacterId: currentSet.entrantA.player2?.slippiCharacterId ?? null,
+			slippiCharacterId:
+				currentSet.entrantA.player2?.character?.slippiCharacterId ?? null,
 			entrantId: currentSet.entrantA.startggEntrantId,
 		},
 		{
-			slippiCharacterId: currentSet.entrantB.player1.slippiCharacterId,
+			slippiCharacterId:
+				currentSet.entrantB.player1.character?.slippiCharacterId ?? null,
 			entrantId: currentSet.entrantB.startggEntrantId,
 		},
 		{
-			slippiCharacterId: currentSet.entrantB.player2?.slippiCharacterId ?? null,
+			slippiCharacterId:
+				currentSet.entrantB.player2?.character?.slippiCharacterId ?? null,
 			entrantId: currentSet.entrantB.startggEntrantId,
 		},
 	].flatMap(({ slippiCharacterId, entrantId }) => {

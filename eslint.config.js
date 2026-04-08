@@ -42,13 +42,12 @@ export default defineConfig([
 			"unicorn/no-null": "off",
 			"unicorn/prevent-abbreviations": [
 				"error",
-				// allow "Props" for react props interfaces
-				{ allowList: { Props: true } },
+				// allow "Props" for react props interfaces and "Ref" for react refs
+				{ allowList: { Props: true, Ref: true, ref: true } },
 			],
 			// dont enforce separators because of e.g. port numbers where it would be silly
 			"unicorn/numeric-separators-style": "off",
 			"@typescript-eslint/strict-boolean-expressions": "error",
-			"@typescript-eslint/consistent-return": "error",
 			"@typescript-eslint/consistent-type-imports": "error",
 			"@typescript-eslint/default-param-last": "error",
 			"@typescript-eslint/method-signature-style": "error",

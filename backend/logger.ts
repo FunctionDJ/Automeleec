@@ -1,12 +1,24 @@
 import { type } from "arktype";
+import * as winston from "winston";
+import DailyRotateFile from "winston-daily-rotate-file";
 
-/* eslint-disable no-console */
+const winstonLogger = winston.createLogger({
+	transports: [
+		new winston.transports.Console(),
+		new DailyRotateFile({
+			dirname: "logs",
+		}),
+	],
+});
+
 export const loggingEmitter = new EventTarget();
 
 export const LogEntry = type({
 	level: "'info'|'warn'|'error'",
 	message: "string",
 });
+
+// [FUTURE] maybe emit can be baked into winston as a transport
 
 const emit = (level: "info" | "warn" | "error", message: string) => {
 	const logEntry: typeof LogEntry.infer = { level, message };
@@ -39,9 +51,9 @@ export const prefixLogger = (module?: Modules, additionalPrefix?: string) => {
 			const assembled = assembleMessage(message);
 
 			if (details === undefined) {
-				console.info(assembled);
+				winstonLogger.info(assembled);
 			} else {
-				console.info(assembled, "\nDetails:\n", details);
+				winstonLogger.info(assembled, "\nDetails:\n", details);
 			}
 
 			emit(
@@ -53,9 +65,9 @@ export const prefixLogger = (module?: Modules, additionalPrefix?: string) => {
 			const assembled = assembleMessage(message);
 
 			if (details === undefined) {
-				console.warn(assembled);
+				winstonLogger.warn(assembled);
 			} else {
-				console.warn(assembled, "\nDetails:\n", details);
+				winstonLogger.warn(assembled, "\nDetails:\n", details);
 			}
 
 			emit(
@@ -67,9 +79,9 @@ export const prefixLogger = (module?: Modules, additionalPrefix?: string) => {
 			const assembled = assembleMessage(message);
 
 			if (details === undefined) {
-				console.error(assembled);
+				winstonLogger.error(assembled);
 			} else {
-				console.error(assembled, "\nDetails:\n", details);
+				winstonLogger.error(assembled, "\nDetails:\n", details);
 			}
 
 			emit(

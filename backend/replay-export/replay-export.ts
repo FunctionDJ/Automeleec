@@ -7,10 +7,10 @@ import {
 import {
 	getStationOrThrow,
 	type CurrentSet,
-	type EntrantInCurrentSet,
+	type EntrantInActiveStartGGSet,
 } from "../state";
 import fs from "node:fs";
-import { prefixLogger } from "../logger/logger";
+import { prefixLogger } from "../logger";
 
 // TODO are we recording replays even if mode is not startgg etc? like, the only dependency is slippi/station being connected?
 
@@ -31,8 +31,9 @@ import { prefixLogger } from "../logger/logger";
  * example for doubles non-pools parent folder: 1723 – Foo & Baz vs Bar & Qux – WR2 – Sapf2
  */
 
-const getEntrantString = (entrant: typeof EntrantInCurrentSet.infer) => {
-	return `${entrant.player1.tag} (${entrant.player1.slippiCharacterId})`;
+const getEntrantString = (entrant: typeof EntrantInActiveStartGGSet.infer) => {
+	// TODO this is currently using the character id but it should actually use the character's long name as stored/used/provided by slippi-js
+	return `${entrant.player1.tag} (${entrant.player1.character?.slippiCharacterId})`;
 };
 
 const dateToHHMM = (date: Date) => {

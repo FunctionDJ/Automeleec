@@ -3,7 +3,7 @@ import { createServer } from "node:http";
 import { createServer as createViteServer, type ViteDevServer } from "vite";
 import { appRouter } from "./router";
 import "./startgg-import/sapfpresse-updater";
-import { prefixLogger } from "./logger/logger";
+import { prefixLogger } from "./logger";
 
 /**
  * we're checking for temp replay files here and crashing early

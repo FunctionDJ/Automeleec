@@ -1,10 +1,17 @@
 import type { PlayerType } from "@slippi/slippi-js/node";
-import type { PlayerInCurrentSet } from "../state";
+import type { PlayerInActiveStartGGSet } from "../state";
 
 export const applyPlayerTypeToState = (
-	playerInCurrentSet: typeof PlayerInCurrentSet.infer,
+	playerInCurrentSet: typeof PlayerInActiveStartGGSet.infer,
 	playerType: PlayerType,
 ) => {
-	playerInCurrentSet.slippiCharacterId = playerType.characterId ?? null;
-	playerInCurrentSet.slippiCharacterColorId = playerType.characterColor ?? null;
+	const { characterId, characterColor } = playerType;
+
+	playerInCurrentSet.character =
+		characterId === undefined || characterColor === undefined
+			? null
+			: {
+					slippiCharacterId: characterId,
+					slippiCharacterColorId: characterColor,
+				};
 };

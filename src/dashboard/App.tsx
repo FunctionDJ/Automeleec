@@ -5,11 +5,11 @@ import {
 	ThemeProvider,
 } from "@mui/material";
 import { useSubscription } from "@trpc/tanstack-react-query";
+import { Toaster } from "react-hot-toast";
 import { trpc } from "../trpc-client";
-import { TrpcErrorNotifications } from "../TrpcErrorNotifications";
 import { CenterTextControl } from "./CenterTextControl";
-import { StationPanel } from "./StationPanel";
 import { DashboardSettingsControl } from "./DashboardSettingsControl";
+import { StationPanel } from "./StationPanel";
 
 const darkTheme = createTheme({
 	palette: { mode: "dark" },
@@ -64,7 +64,7 @@ export function App() {
 					))}
 				</div>
 			</div>
-			<TrpcErrorNotifications />
+			<Toaster />
 		</ThemeProvider>
 	);
 }

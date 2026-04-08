@@ -1,5 +1,6 @@
-node_modules
+/node_modules/
 .env
-replace/*.slp
-replace/*.zip
-state.json
+/replays/*.slp
+/replays/*.zip
+/state.json
+/logs/

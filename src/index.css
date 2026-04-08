@@ -4,3 +4,7 @@
 	font-family: "Halo Dek";
 	src: url("/src/scoreboard/assets/Halo%20Dek.ttf") format("truetype");
 }
+
+.MuiPaper-root {
+	transition-duration: 150ms !important;
+}

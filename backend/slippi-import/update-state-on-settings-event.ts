@@ -1,5 +1,5 @@
 import type { GameStartType, PlayerType } from "@slippi/slippi-js/node";
-import { prefixLogger } from "../logger/logger";
+import { prefixLogger } from "../logger";
 import { updateStationSync } from "../state";
 import { applyPlayerTypeToState } from "./apply-playertype";
 import { findPlayerInSlippiSettings } from "./find-player-in-slippi-settings";

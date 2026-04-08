@@ -1,65 +1,58 @@
+import type { Character } from "../../backend/state";
+import { StockIcon } from "../shared-frontend/StockIcon";
+import { CustomAutoTextSize } from "./CustomAutoTextSize";
 import { Stroked } from "./Stroked";
 
-export interface PlayerState {
+export interface EntrantInScoreboard {
 	tag: string;
 	pronouns: string;
-	score: number;
+	score: number | null;
+	characters: (typeof Character.infer)[];
 }
 
-export const PlayerRow = ({
-	className,
-	align,
-	player,
-}: {
+interface Props {
 	className?: string;
 	align: "L" | "R";
-	player: PlayerState;
-}) => {
-	const f1 = Math.max(player.tag.length - 10, 0);
-	const f2 = f1 * 0.2;
-	const root = Math.max(Math.sqrt(f2), 0);
+	entrant: EntrantInScoreboard;
+}
 
-	const rootForStroke = Math.sqrt(f2);
-
-	const alignClass = align === "L" ? "left-[1vw]" : "right-[1vw]";
+export const PlayerRow = ({ className, align, entrant }: Props) => {
+	const alignClass =
+		align === "L" ? "left-[1vw] right-0" : "left-0 right-[1vw]";
 	const flexClass = align === "L" ? "flex-row-reverse" : "flex-row";
 	const pronounsClass = align === "L" ? "left-0" : "right-0";
 
 	return (
 		<div
-			className={`absolute ${alignClass} flex ${flexClass} gap-[1vw] items-center text-[3vw] ${className}`}
+			className={`absolute h-1/2 ${alignClass} flex ${flexClass} gap-[0.5vw] text-[3vw] ${className} px-1 py-0.5 items-center`}
 		>
-			{/* {player.score === 1 && (
-				<div className="text-black text-xs fixed left-2/5 top-1/5 z-100 font-mono">
-					<div>len {player.tag.length}</div>
-					<div>f1 {f1}</div>
-					<div>f2 {f2}</div>
-					<div>log {log}</div>
-				</div>
-			)} */}
-			<div className="relative">
+			<div className="relative flex grow h-full py-0.5">
 				<Stroked
 					className={`absolute z-10 -top-[1.8vw] ${pronounsClass} text-[1.4vw]`}
 					stroke={0.6}
 				>
-					{player.pronouns}
+					{entrant.pronouns}
 				</Stroked>
-
+				{/* TODO add framer motion... somehow */}
 				<div
-					style={{
-						fontSize: `calc(2.5vw - ${root}vw)`,
-					}}
+					className={`flex-1 ${align === "L" ? "justify-start" : "justify-end"} flex`}
 				>
-					<Stroked stroke={0.8 - rootForStroke * 0.15}>{player.tag}</Stroked>
+					{/* wrapper just for AutoTextSize because otherwise it shows a warning: "AutoTextSize has 1 siblings. This may interfere with the algorithm." */}
+
+					<CustomAutoTextSize className="absolute self-center">
+						{entrant.tag}
+					</CustomAutoTextSize>
 				</div>
 			</div>
-			<img
-				className="w-[3vw] aspect-square"
-				style={{ imageRendering: "pixelated" }}
-				src="/stock-icons/Falcon.png"
-			/>
-			<div className="flex justify-center w-[2vw] text-[3vw]">
-				<Stroked>{player.score}</Stroked>
+			<StockIcon className="h-3/4" character={entrant.characters[0] ?? null} />
+			{entrant.characters.length > 1 && (
+				<StockIcon
+					className="h-3/4"
+					character={entrant.characters[1] ?? null}
+				/>
+			)}
+			<div className="flex justify-center w-[2.3vw] text-[3vw]">
+				<Stroked>{entrant.score}</Stroked>
 			</div>
 		</div>
 	);

@@ -7,7 +7,11 @@ import {
 } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
-import type { PlayerInCurrentSet, Ports, Station } from "../../backend/state";
+import type {
+	PlayerInActiveStartGGSet,
+	Ports,
+	Station,
+} from "../../backend/state";
 import { getPlayersFromCurrentSet } from "../../shared/entrant-utilities";
 import { trpc } from "../trpc-client";
 
@@ -37,7 +41,7 @@ export function PortsControl({ station }: { station: typeof Station.infer }) {
 
 	const availableForPort = (
 		portIndex: number,
-		allPlayers: (typeof PlayerInCurrentSet.infer)[],
+		allPlayers: (typeof PlayerInActiveStartGGSet.infer)[],
 	) => {
 		const currentId = input[portIndex];
 		return allPlayers.filter(

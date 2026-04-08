@@ -7,3 +7,5 @@ this project is an automatic reporting and stream overlay system for smash bros 
 i favour minimalism and having as few lines of code as reasonably possible while not sacrificing readability, correctness or reliability.
 
 in the UI, avoid onBlur and prefer debouncing instead.
+
+accessibility / a11y / "aria" are not needed for this project at all and should be avoided to reduce the amount of code.

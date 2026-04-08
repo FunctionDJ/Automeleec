@@ -1,6 +1,6 @@
 import { on } from "node:events";
 import { dashboardRouter } from "./dashboard-import/dashboard-router.js";
-import { LogEntry, loggingEmitter } from "./logger/logger.js";
+import { LogEntry, loggingEmitter } from "./logger.js";
 import { selfServiceRouter } from "./selfservice-import/selfservice-import.js";
 import { emitter, globalState, State } from "./state.js";
 import { publicProcedure, router } from "./trpc-server.js";

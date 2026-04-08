@@ -11,7 +11,7 @@ import { stationProcedure } from "../station-procedure";
 import { router } from "../trpc-server";
 import { createSlippiConnectionSet } from "./create-slippi-connectionset";
 import { updateStateOnSettingsEvent } from "./update-state-on-settings-event";
-import { prefixLogger } from "../logger/logger";
+import { prefixLogger } from "../logger";
 
 /** maps from stationNumber to connectionSets */
 const slippiConnectionSets: Record<

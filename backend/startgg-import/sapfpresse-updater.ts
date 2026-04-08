@@ -3,7 +3,7 @@ import { globalState as globalState, updateStateSync } from "../state";
 import { SetType } from "./startgg-schemas";
 import { transformStationByStreamQueueSets } from "./startgg-transformers";
 import { fetchStartGG } from "../startgg-interface/fetch-startgg";
-import { prefixLogger } from "../logger/logger";
+import { prefixLogger } from "../logger";
 
 const fetchStartGGAndUpdateState = async () => {
 	if (

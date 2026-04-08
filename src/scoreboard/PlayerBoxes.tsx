@@ -1,113 +1,36 @@
-import { useState } from "react";
+import type { State } from "../../backend/state";
 import { PlayerBox } from "./PlayerBox";
-import type { PlayerState } from "./PlayerRow";
+import { scoreboardAccentColors } from "./colors";
 
-const players: [
-	[PlayerState, PlayerState],
-	[PlayerState, PlayerState],
-	[PlayerState, PlayerState],
-	[PlayerState, PlayerState],
-] = [
-	[
-		{
-			tag: "sprak",
-			pronouns: "they/them",
-			score: 0,
-		},
-		{
-			tag: "sprak",
-			pronouns: "they/them",
-			score: 0,
-		},
-	],
-	[
-		{
-			tag: "sprakkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
-			pronouns: "they/them",
-			score: 1,
-		},
-		{
-			tag: "sprak",
-			pronouns: "they/them",
-			score: 0,
-		},
-	],
+interface Props {
+	state: typeof State.infer;
+}
 
-	[
-		{
-			tag: "sprak",
-			pronouns: "they/them",
-			score: 0,
-		},
-		{
-			tag: "sprak",
-			pronouns: "they/them",
-			score: 0,
-		},
-	],
-	[
-		{
-			tag: "sprakkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
-			pronouns: "they/them",
-			score: 1,
-		},
-		{
-			tag: "sprak",
-			pronouns: "they/them",
-			score: 0,
-		},
-	],
-];
-
-export const PlayerBoxes = () => {
-	// const r = 200;
-	const [name] = useState("");
-
-	// useEffect(() => {
-	// 	let counter = 0;
-
-	// 	const interval = setInterval(() => {
-	// 		if (counter > 50) counter = 0;
-
-	// 		setName("sprak" + "k".repeat(counter++));
-	// 	}, r);
-
-	// 	return () => clearInterval(interval);
-	// }, [r]);
-
-	return (
-		<div id="player-boxes" className="absolute h-full w-full">
-			<PlayerBox
-				align="R"
-				className="bg-pink-500 mt-[10%]"
-				players={[
-					{
-						tag: name,
-						pronouns: "they/them",
-						score: 1,
-					},
-					{
-						tag: "sprak",
-						pronouns: "they/them",
-						score: 0,
-					},
-				]}
-			/>
-			<PlayerBox
-				align="L"
-				className="bg-orange-500 mt-[40%]"
-				players={players[1]}
-			/>
-			<PlayerBox
-				align="L"
-				className="bg-purple-500 mt-[150%]"
-				players={players[2]}
-			/>
-			<PlayerBox
-				align="R"
-				className="bg-emerald-500 mt-[120%]"
-				players={players[3]}
-			/>
-		</div>
-	);
-};
+export const PlayerBoxes = ({ state }: Props) => (
+	<div id="player-boxes" className="absolute h-full w-full z-10">
+		<PlayerBox
+			align="R"
+			className="mt-[10%]"
+			style={{ backgroundColor: scoreboardAccentColors.cherry }}
+			station={state.stations[0]}
+		/>
+		<PlayerBox
+			align="L"
+			className="mt-[40%]"
+			style={{ backgroundColor: scoreboardAccentColors.orange }}
+			station={state.stations[1]}
+		/>
+		<PlayerBox
+			align="L"
+			className="mt-[150%]"
+			style={{ backgroundColor: scoreboardAccentColors.grape }}
+			station={state.stations[2]}
+		/>
+		<PlayerBox
+			align="R"
+			className="mt-[120%]"
+			style={{ backgroundColor: scoreboardAccentColors.apple }}
+			station={state.stations[3]}
+		/>
+	</div>
+);

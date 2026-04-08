@@ -1,5 +1,5 @@
 import { type } from "arktype";
-import { prefixLogger } from "../logger/logger";
+import { prefixLogger } from "../logger";
 import { fetchStartGG } from "../startgg-interface/fetch-startgg";
 import { globalState } from "../state";
 
