@@ -33,9 +33,10 @@ const getStockIconSource = (
 interface Props {
 	className?: string;
 	character: typeof Character.infer | null;
+	uniqueKey: string;
 }
 
-export const StockIcon = ({ className, character }: Props) => {
+export const StockIcon = ({ uniqueKey, className, character }: Props) => {
 	const characterId = character?.slippiCharacterId ?? null;
 	const colorId = character?.slippiCharacterColorId ?? null;
 
@@ -46,7 +47,7 @@ export const StockIcon = ({ className, character }: Props) => {
 				initial={{ opacity: 0 }}
 				animate={{ opacity: 1 }}
 				exit={{ opacity: 0 }}
-				key={`${characterId}-${colorId}`}
+				key={`${uniqueKey}${characterId}-${colorId}`}
 				className={`drop-shadow-xs drop-shadow-black/75 ${className ?? ""}`}
 				style={{ imageRendering: "pixelated" }}
 				src={

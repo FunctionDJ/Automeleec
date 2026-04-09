@@ -5,7 +5,7 @@ import {
 	ThemeProvider,
 } from "@mui/material";
 import { useSubscription } from "@trpc/tanstack-react-query";
-import { Toaster } from "react-hot-toast";
+import reactHotToast, { Toaster } from "react-hot-toast";
 import { trpc } from "../trpc-client";
 import { CenterTextControl } from "./CenterTextControl";
 import { DashboardSettingsControl } from "./DashboardSettingsControl";
@@ -19,6 +19,20 @@ const darkTheme = createTheme({
 export function App() {
 	const subscription = useSubscription(
 		trpc.stateSubscription.subscriptionOptions(),
+	);
+
+	useSubscription(
+		trpc.loggerSubscription.subscriptionOptions(undefined, {
+			onData: (logEntry) => {
+				if (logEntry.level === "warn") {
+					reactHotToast(`Warning: ${logEntry.message}`);
+				}
+
+				if (logEntry.level === "error") {
+					reactHotToast.error(`Error: ${logEntry.message}`);
+				}
+			},
+		}),
 	);
 
 	if (subscription.error) {

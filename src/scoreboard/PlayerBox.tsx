@@ -1,54 +1,19 @@
 import { twMerge } from "tailwind-merge";
-import type {
-	Character,
-	Entrant,
-	EntrantInActiveSet,
-	EntrantOverrides,
-	Station,
-} from "../../backend/state";
+import type { EntrantOverrides, Station } from "../../backend/state";
+import {
+	entrantsToCharacter,
+	entrantToPronouns,
+	entrantToTag,
+} from "../shared-frontend/entrant-to-x";
 import { PlayerRow, type EntrantInScoreboard } from "./PlayerRow";
 
 interface Props {
+	uniqueKey: string;
 	className: string;
 	align: "L" | "R";
 	station: typeof Station.infer | undefined;
 	style: React.CSSProperties;
 }
-
-const entrantsToCharacter = (entrant: typeof EntrantInActiveSet.infer) => {
-	const charactersInScoreboard: (typeof Character.infer)[] = [];
-
-	const pushIfExists = (character: typeof Character.infer | null) => {
-		if (character !== null) {
-			charactersInScoreboard.push(character);
-		}
-	};
-
-	pushIfExists(entrant.player1.character);
-	pushIfExists(entrant.player2?.character ?? null);
-
-	return charactersInScoreboard;
-};
-
-const entrantToTag = (entrant: typeof Entrant.infer) => {
-	let result = entrant.player1.tag;
-
-	if (entrant.player2) {
-		result += " & " + entrant.player2.tag;
-	}
-
-	return result;
-};
-
-const entrantToPronouns = (entrant: typeof Entrant.infer) => {
-	let result = entrant.player1.pronouns;
-
-	if (entrant.player2) {
-		result += " & " + entrant.player2.pronouns;
-	}
-
-	return result;
-};
 
 const emptyEntrantInScoreboard: EntrantInScoreboard = {
 	tag: "",
@@ -109,7 +74,13 @@ const getEntrantInScoreboard = (
 	}
 };
 
-export const PlayerBox = ({ className, align, station, style }: Props) => {
+export const PlayerBox = ({
+	uniqueKey,
+	className,
+	align,
+	station,
+	style,
+}: Props) => {
 	const roundedClass = align === "L" ? "rounded-r-[2vw]" : "rounded-l-[2vw]";
 	const alignClass = align === "L" ? "left-0" : "right-0";
 
@@ -125,11 +96,13 @@ export const PlayerBox = ({ className, align, station, style }: Props) => {
 			style={style}
 		>
 			<PlayerRow
+				uniqueKey={`${uniqueKey}-A`}
 				className="bottom-1/2"
 				entrant={entrantAInScoreBoard}
 				align={align}
 			/>
 			<PlayerRow
+				uniqueKey={`${uniqueKey}-B`}
 				className="bottom-0"
 				entrant={entrantBInScoreBoard}
 				align={align}

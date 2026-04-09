@@ -11,9 +11,15 @@ interface Props {
 	entrant: typeof EntrantInActiveSet.infer;
 	side: "left" | "right";
 	stationNumber: number;
+	keyForMotion: string;
 }
 
-export const EntrantOverride = ({ entrant, side, stationNumber }: Props) => {
+export const EntrantOverride = ({
+	keyForMotion,
+	entrant,
+	side,
+	stationNumber,
+}: Props) => {
 	const [localEntrant, setLocalEntrant] = useState(entrant);
 
 	const { mutate } = useMutation(
@@ -106,6 +112,7 @@ export const EntrantOverride = ({ entrant, side, stationNumber }: Props) => {
 				</div>
 			</div>
 			<PlayerOverride
+				keyForMotion={`${keyForMotion}-player1`}
 				label={localEntrant.player2 === null ? "" : "Player 1"}
 				player={localEntrant.player1}
 				onChange={(player1) => update({ ...localEntrant, player1 })}
@@ -113,6 +120,7 @@ export const EntrantOverride = ({ entrant, side, stationNumber }: Props) => {
 
 			{localEntrant.player2 !== null && (
 				<PlayerOverride
+					keyForMotion={`${keyForMotion}-player2`}
 					label="Player 2"
 					player={localEntrant.player2}
 					onChange={(player2) => update({ ...localEntrant, player2 })}

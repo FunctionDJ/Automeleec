@@ -61,9 +61,10 @@ export function PortsControl({ station }: { station: typeof Station.infer }) {
 						: "Ports (inactive because of mode)"}
 				</Typography>
 				{!isValid && (
-					<Typography variant="caption" color="error">
-						Assign all {players.length} players to a port, otherwise
-						auto-reporting won&apos;t work
+					<Typography variant="caption" color="warning.main">
+						Either players use the Self-Service portal (tablet) to assign ports
+						themselves, or you should do it here, otherwise auto-reporting
+						won&apos;t work.
 					</Typography>
 				)}
 			</div>

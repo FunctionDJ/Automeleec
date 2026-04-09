@@ -2,6 +2,7 @@ import {
 	SlpFileWriter,
 	SlpFileWriterEvent,
 	SlpStreamEvent,
+	characters,
 	type SlpStream,
 } from "@slippi/slippi-js/node";
 import {
@@ -32,8 +33,12 @@ import { prefixLogger } from "../logger";
  */
 
 const getEntrantString = (entrant: typeof EntrantInActiveStartGGSet.infer) => {
-	// TODO this is currently using the character id but it should actually use the character's long name as stored/used/provided by slippi-js
-	return `${entrant.player1.tag} (${entrant.player1.character?.slippiCharacterId})`;
+	const characterId = entrant.player1.character?.slippiCharacterId;
+
+	const character =
+		characterId === undefined ? null : characters.getCharacterName(characterId);
+
+	return `${entrant.player1.tag}${character === null ? "" : ` (${character})`}`;
 };
 
 const dateToHHMM = (date: Date) => {

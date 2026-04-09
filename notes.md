@@ -1,13 +1,12 @@
 ## self-service
 
 - _maybe_ listen to loggingSubscription errors ?
-- next up / fetch by stream queue + split by station
 - indicator für connection status mit backend
 - nach set ende das gerade abgeschlossene set noch 1-2 minuten anzeigen aber mit "next set" button
 
 ## dashboard
 
-- listen to loggingSubscription errors and warnings and add a logging box where "info" is also stored with the others (!!!)
+- add a logging box for loggingSubscription where "info" is also stored with the other types
 - show warning or "handwarmers (?)" when a slippi set is started without ports assignment / set started
 - manual overrides für overlay (runde/pool etc)
 - nach set ende das gerade abgeschlossene set noch 1-2 minuten anzeigen aber mit "next set" button
@@ -19,13 +18,14 @@
 
 ## alle
 
+- installation auf nem neuen windows PC testen
 - UI crash detection / warning für backend
 - meine credits (waffeln) mit "go play Project+!" klein und in die ecke packen, aber maybe nicht on-stream
 - **(außer stream-layout) timer wenn ein set gecalled wird**
 
 ## stream-layout
 
-- bauen
+- round display?
 - stretch goal: 2-station und 1-station varianten mit dashboard toggle dafür
 - indicator für connection status mit backend
 - nach set ende das gerade abgeschlossene set noch 1-2 minuten anzeigen und danach "next set" info (queue)
@@ -46,8 +46,6 @@ https://github.com/Readek/Melee-Stream-Tool
 - rename to sapfladen???
 
 - das system soll in der lage sein, es zu verkraften, wenn ein set per self-service erst nach dem start eines matches gestartet wurde, also dass per slippi trotzdem immer die aktuellen characters und die stage gespeichert werden, falls erst danach ein match gestartet und dann character/stage für mindestens das overlay, aber im optimalfall für startgg vorhanden sind
-
-- trpc/tanstack-react-query benutzen wo es noch nicht benutzt wird
 
 ## future
 

@@ -1,4 +1,10 @@
-import { MenuItem, Paper, TextField, Typography } from "@mui/material";
+import {
+	Autocomplete,
+	MenuItem,
+	Paper,
+	TextField,
+	Typography,
+} from "@mui/material";
 import { characters } from "@slippi/slippi-js";
 import type { EntrantInActiveSet } from "../../backend/state";
 import { StockIcon } from "../shared-frontend/StockIcon";
@@ -9,13 +15,21 @@ const playableCharacters = characters
 	.getAllCharacters()
 	.filter((character) => character.id <= 25);
 
+const pronounOptions = ["they/them", "he/him", "she/her"];
+
 interface Props {
 	label: string;
 	player: PlayerValue;
 	onChange: (player: PlayerValue) => void;
+	keyForMotion: string;
 }
 
-export const PlayerOverride = ({ label, player, onChange }: Props) => {
+export const PlayerOverride = ({
+	keyForMotion,
+	label,
+	player,
+	onChange,
+}: Props) => {
 	const selectedCharacter = playableCharacters.find(
 		(character) => character.id === player.character?.slippiCharacterId,
 	);
@@ -40,17 +54,30 @@ export const PlayerOverride = ({ label, player, onChange }: Props) => {
 					})
 				}
 			/>
-			<TextField
-				label="Pronouns"
-				className="w-28"
+			<Autocomplete
+				freeSolo
+				openOnFocus
+				options={pronounOptions}
 				size="small"
+				className="w-28"
 				value={player.pronouns}
-				onChange={(event) =>
+				onChange={(_event, value) =>
 					onChange({
 						...player,
-						pronouns: event.target.value,
+						pronouns: value ?? "",
 					})
 				}
+				onInputChange={(_event, value, reason) => {
+					if (reason === "input" || reason === "clear") {
+						onChange({
+							...player,
+							pronouns: value,
+						});
+					}
+				}}
+				renderInput={(autocompleteInput) => (
+					<TextField {...autocompleteInput} label="Pronouns" />
+				)}
 			/>
 			<TextField
 				select
@@ -129,7 +156,11 @@ export const PlayerOverride = ({ label, player, onChange }: Props) => {
 				))}
 			</TextField>
 			<div className="flex items-center gap-2">
-				<StockIcon className="h-8 w-8" character={player.character} />
+				<StockIcon
+					uniqueKey={keyForMotion}
+					className="h-8 w-8"
+					character={player.character}
+				/>
 			</div>
 		</Paper>
 	);

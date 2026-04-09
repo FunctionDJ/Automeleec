@@ -17,11 +17,13 @@ export function OverrideControls({
 			<Typography variant="subtitle2">Entrant Override</Typography>
 			<div className="flex flex-col gap-2">
 				<EntrantOverride
+					keyForMotion={`entrant-${stationNumber}-A`}
 					entrant={entrantOverride.entrantA}
 					side="left"
 					stationNumber={stationNumber}
 				/>
 				<EntrantOverride
+					keyForMotion={`entrant-${stationNumber}-B`}
 					entrant={entrantOverride.entrantB}
 					side="right"
 					stationNumber={stationNumber}

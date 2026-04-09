@@ -21,11 +21,12 @@ import {
 import { green, purple } from "@mui/material/colors";
 import { useState } from "react";
 import type { Station } from "../../backend/state";
+import { entrantToTag } from "../shared-frontend/entrant-to-x";
+import { setToRoundText } from "../shared-frontend/set-to-roundtext";
 import { mainThemeConfig } from "./main-theme";
 import { RunningSetRow } from "./RunningSetRow";
 import { StationDialogs } from "./StationDialogs";
 import { Timer } from "./Timer";
-import { Round } from "./Round";
 
 interface Props {
 	station: typeof Station.infer;
@@ -116,7 +117,7 @@ export const StationComponent = ({ station }: Props) => {
 											{currentSet === null ? (
 												"[No currentSet]"
 											) : (
-												<Round set={currentSet} />
+												<span>{setToRoundText(currentSet)}</span>
 											)}
 										</Typography>
 									</TableCell>
@@ -178,10 +179,17 @@ export const StationComponent = ({ station }: Props) => {
 				<Card sx={{ bgcolor: "grey.700" }} className="mt-10">
 					<CardContent>
 						<Typography className="text-center">Next up</Typography>
-						<Typography>Foo vs Bar</Typography>
-						<Typography>Foo vs Bar</Typography>
-						<Typography>Foo vs Bar</Typography>
-						<Typography>Foo vs Bar</Typography>
+						{station.upcomingSets.length === 0 && (
+							<Typography className="text-center italic">
+								[No upcoming sets]
+							</Typography>
+						)}
+						{station.upcomingSets.map((set) => (
+							<Typography key={set.startggSetId}>
+								{setToRoundText(set)}: {entrantToTag(set.entrantA)} vs{" "}
+								{entrantToTag(set.entrantB)}
+							</Typography>
+						))}
 					</CardContent>
 				</Card>
 			</ThemeProvider>
