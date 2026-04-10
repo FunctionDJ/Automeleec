@@ -27,6 +27,31 @@ export const reportBracketSetBySlippiData = async ({
 		return;
 	}
 
+	if (!station.slippi.shouldReportSetOnGameEnd) {
+		logger.error(
+			`SETTINGS were not processed for this game, skipping report attempt`,
+		);
+		return;
+	}
+
+	const requiredParticipants = [
+		currentSet.entrantA.player1.startggParticipantId,
+		currentSet.entrantA.player2?.startggParticipantId ?? null,
+		currentSet.entrantB.player1.startggParticipantId,
+		currentSet.entrantB.player2?.startggParticipantId ?? null,
+	].filter((id): id is number => id !== null).length;
+
+	const mappedPorts = station.ports.filter(
+		(id): id is number => id !== null,
+	).length;
+
+	if (mappedPorts < requiredParticipants) {
+		logger.error(
+			`Missing port mappings (${mappedPorts}/${requiredParticipants}), skipping report`,
+		);
+		return;
+	}
+
 	const setGames = await fetchSetGames(currentSet.startggSetId);
 
 	if (setGames === null) {

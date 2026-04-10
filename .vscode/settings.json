@@ -34,6 +34,14 @@
 		"/^bun lint$/": {
 			"approve": true,
 			"matchCommandLine": true
+		},
+		"/^bun run typecheck$/": {
+			"approve": true,
+			"matchCommandLine": true
+		},
+		"/^bun run lint$/": {
+			"approve": true,
+			"matchCommandLine": true
 		}
 	},
 	"todo-tree.general.tags": [

@@ -82,9 +82,9 @@ export const SetType = type({
 	id: "number",
 	round: SetRound,
 	fullRoundText: "string",
-	station: {
+	station: type({
 		number: "number",
-	},
+	}).or("null"),
 	slots: Slot.array(),
 	phaseGroup: PhaseGroup,
 	state: SetStateFromStartgg,

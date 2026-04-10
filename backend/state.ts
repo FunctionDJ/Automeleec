@@ -87,6 +87,8 @@ export const EntrantOverrides = type({
 export const Station = type({
 	bestOf: "number",
 	startggStationNumber: "number",
+	commentators: "string",
+	highlighted: "boolean",
 	mode: Mode,
 	basicTextOverride: "string",
 	entrantOverride: EntrantOverrides,
@@ -96,6 +98,7 @@ export const Station = type({
 	slippi: {
 		ip: "string",
 		port: "number",
+		shouldReportSetOnGameEnd: "boolean",
 		slippiState: type.or(
 			{
 				status: "'disconnected'",

@@ -2,12 +2,44 @@ import { type } from "arktype";
 import { State, type Station } from "./state";
 import { prefixLogger } from "./logger";
 
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+	typeof value === "object" && value !== null;
+
 export const loadState = async (): Promise<typeof State.infer> => {
 	const logger = prefixLogger("LoadState");
 	const stateFile = Bun.file("state.json");
 
 	if (await stateFile.exists()) {
 		const json = (await stateFile.json()) as unknown;
+
+		if (isRecord(json)) {
+			const { stations } = json;
+
+			if (Array.isArray(stations)) {
+				for (const maybeStation of stations) {
+					if (!isRecord(maybeStation)) {
+						continue;
+					}
+					const station = maybeStation;
+
+					if (typeof station.commentators !== "string") {
+						station.commentators = "";
+					}
+
+					if (typeof station.highlighted !== "boolean") {
+						station.highlighted = false;
+					}
+
+					if (
+						isRecord(station.slippi) &&
+						typeof station.slippi.shouldReportSetOnGameEnd !== "boolean"
+					) {
+						station.slippi.shouldReportSetOnGameEnd = false;
+					}
+				}
+			}
+		}
+
 		const stateValidateResult = State(json);
 
 		if (stateValidateResult instanceof type.errors) {
@@ -17,6 +49,7 @@ export const loadState = async (): Promise<typeof State.infer> => {
 
 			for (const station of stateValidateResult.stations) {
 				station.slippi.slippiState.status = "disconnected";
+				station.slippi.shouldReportSetOnGameEnd = false;
 			}
 
 			return stateValidateResult;
@@ -30,6 +63,8 @@ export const loadState = async (): Promise<typeof State.infer> => {
 			(startggStationNumber): typeof Station.infer => ({
 				bestOf: 5,
 				startggStationNumber,
+				commentators: "",
+				highlighted: false,
 				mode: "startgg",
 				basicTextOverride: "",
 				entrantOverride: {
@@ -58,6 +93,7 @@ export const loadState = async (): Promise<typeof State.infer> => {
 				slippi: {
 					ip: "",
 					port: 51441,
+					shouldReportSetOnGameEnd: false,
 					slippiState: { status: "disconnected" },
 				},
 			}),

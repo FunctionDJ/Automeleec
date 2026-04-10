@@ -1,11 +1,12 @@
 import {
+	Button,
 	CircularProgress,
 	createTheme,
 	CssBaseline,
 	ThemeProvider,
 } from "@mui/material";
 import { useSubscription } from "@trpc/tanstack-react-query";
-import reactHotToast, { Toaster } from "react-hot-toast";
+import reactHotToast, { ToastBar, Toaster } from "react-hot-toast";
 import { trpc } from "../trpc-client";
 import { CenterTextControl } from "./CenterTextControl";
 import { DashboardSettingsControl } from "./DashboardSettingsControl";
@@ -82,7 +83,24 @@ export function App() {
 				toastOptions={{
 					duration: 20000,
 				}}
-			/>
+			>
+				{(t) => (
+					<ToastBar toast={t}>
+						{({ icon, message }) => (
+							<div className="flex items-center gap-2">
+								{icon}
+								<div>{message}</div>
+								<Button
+									size="small"
+									onClick={() => reactHotToast.dismiss(t.id)}
+								>
+									Dismiss
+								</Button>
+							</div>
+						)}
+					</ToastBar>
+				)}
+			</Toaster>
 		</ThemeProvider>
 	);
 }

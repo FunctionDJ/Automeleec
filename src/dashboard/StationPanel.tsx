@@ -1,4 +1,5 @@
 import {
+	Button,
 	Card,
 	CardContent,
 	Divider,
@@ -47,13 +48,55 @@ export function StationPanel({ station }: { station: typeof Station.infer }) {
 		500,
 	);
 
+	const [commentators, setCommentators] = useState(station.commentators);
+	const commentatorsMutation = useMutation(
+		trpc.dashboard.setCommentators.mutationOptions(),
+	);
+	const submitCommentators = useDebouncedCallback(
+		(text: string) =>
+			commentatorsMutation.mutate({
+				stationNumber: n,
+				commentators: text,
+			}),
+		500,
+	);
+
+	const highlightedMutation = useMutation(
+		trpc.dashboard.setHighlighted.mutationOptions(),
+	);
+
 	const modeMutation = useMutation(trpc.dashboard.setMode.mutationOptions());
 
 	return (
-		<Card>
+		<Card
+			sx={
+				station.highlighted
+					? {
+							borderWidth: 2,
+							borderStyle: "solid",
+							borderColor: "warning.main",
+						}
+					: undefined
+			}
+		>
 			<CardContent className="flex flex-col gap-3">
 				<div className="flex items-center justify-between">
-					<Typography variant="h6">Station {n}</Typography>
+					<div className="flex items-center gap-3">
+						<Typography variant="h6">Station {n}</Typography>
+						<Button
+							size="small"
+							variant={station.highlighted ? "contained" : "outlined"}
+							color="warning"
+							onClick={() =>
+								highlightedMutation.mutate({
+									stationNumber: n,
+									highlighted: !station.highlighted,
+								})
+							}
+						>
+							{station.highlighted ? "Highlighted" : "Highlight"}
+						</Button>
+					</div>
 
 					<div className="flex gap-3 items-center">
 						<SlippiConnectionControl station={station} />
@@ -103,6 +146,13 @@ export function StationPanel({ station }: { station: typeof Station.infer }) {
 								</Select>
 							</FormControl>
 						</Tooltip>
+
+						{station.mode === "startgg" && station.currentSet !== null && (
+							<Typography variant="body2" color="text.secondary">
+								Score: {station.currentSet.entrantA.score} -{" "}
+								{station.currentSet.entrantB.score}
+							</Typography>
+						)}
 					</div>
 				</div>
 
@@ -124,6 +174,17 @@ export function StationPanel({ station }: { station: typeof Station.infer }) {
 							}}
 						/>
 					)}
+
+					<TextField
+						label="Commentators"
+						size="small"
+						className="grow"
+						value={commentators}
+						onChange={(event) => {
+							setCommentators(event.target.value);
+							submitCommentators(event.target.value);
+						}}
+					/>
 				</div>
 
 				{station.mode === "entrant-override" && (

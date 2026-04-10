@@ -110,10 +110,27 @@ export const dashboardRouter = router({
 		.mutation(({ input, ctx }) => {
 			ctx.station.bestOf = input.bestOf;
 		}),
+	setCommentators: stationProcedure
+		.input(type({ commentators: "string" }))
+		.mutation(({ input, ctx }) => {
+			ctx.station.commentators = input.commentators;
+		}),
+	setHighlighted: stationProcedure
+		.input(type({ highlighted: "boolean" }))
+		.mutation(({ input, ctx }) => {
+			if (input.highlighted) {
+				for (const station of globalState.stations) {
+					station.highlighted = false;
+				}
+			}
+
+			ctx.station.highlighted = input.highlighted;
+		}),
 	setPorts: stationProcedure
 		.input(type({ ports: Ports }))
 		.mutation(({ input, ctx }) => {
 			ctx.station.ports = input.ports;
+			ctx.station.slippi.shouldReportSetOnGameEnd = false;
 		}),
 	setEntrantOverride: stationProcedure
 		.input(

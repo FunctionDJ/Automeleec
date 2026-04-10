@@ -12,6 +12,8 @@ export const updateStateOnSettingsEvent = (
 		const logger = prefixLogger("SlippiController", `Station ${stationNumber}`);
 		const { currentSet } = station;
 
+		station.slippi.shouldReportSetOnGameEnd = false;
+
 		if (currentSet === null) {
 			const message = `Received SETTINGS event but there is no current set in state.`;
 			logger.error(message);
@@ -84,5 +86,6 @@ export const updateStateOnSettingsEvent = (
 		}
 
 		currentSet.slippiStage = stageId;
+		station.slippi.shouldReportSetOnGameEnd = true;
 	});
 };

@@ -115,7 +115,7 @@ export const transformStationByStreamQueueSets = (
 
 	const sggSetsAtThisStation = allSetsInStreamQueue.filter(
 		(set) =>
-			set.station.number === station.startggStationNumber &&
+			set.station?.number === station.startggStationNumber &&
 			set.state !== "invalid",
 	);
 
@@ -174,6 +174,7 @@ export const transformStationByStreamQueueSets = (
 
 			station.currentSet = null;
 			station.ports = [null, null, null, null];
+			station.slippi.shouldReportSetOnGameEnd = false;
 		}
 
 		return;
@@ -185,4 +186,5 @@ export const transformStationByStreamQueueSets = (
 
 	station.currentSet = setToCurrentSet(ssgSetToAdopt);
 	station.ports = [null, null, null, null];
+	station.slippi.shouldReportSetOnGameEnd = false;
 };

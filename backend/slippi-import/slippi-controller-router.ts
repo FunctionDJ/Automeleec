@@ -6,7 +6,7 @@ import {
 import { TRPCError } from "@trpc/server";
 import { type } from "arktype";
 import { reportBracketSetBySlippiData } from "../startgg-export/report-bracket-set-by-slippi-data";
-import { globalState } from "../state";
+import { globalState, updateStationSync } from "../state";
 import { stationProcedure } from "../station-procedure";
 import { router } from "../trpc-server";
 import { createSlippiConnectionSet } from "./create-slippi-connectionset";
@@ -63,6 +63,10 @@ export const slippiRouter = router({
 		);
 
 		const settingsListener = (settings: GameStartType) => {
+			updateStationSync(ctx.station.startggStationNumber, (station) => {
+				station.slippi.shouldReportSetOnGameEnd = false;
+			});
+
 			if (settings.players.some((p) => p.type === 1)) {
 				// 0 === human, 1 === CPU
 				logger.info(`CPU player detected, skipping SETTINGS processing.`);
@@ -102,6 +106,14 @@ export const slippiRouter = router({
 		const endListener = (gameEnd: GameEndType) => {
 			logger.info("Game end", gameEnd);
 
+			if (!ctx.station.slippi.shouldReportSetOnGameEnd) {
+				logger.info(
+					"Skipping report because SETTINGS were not successfully processed for this game.",
+				);
+				connectionSet.parser.reset();
+				return;
+			}
+
 			reportBracketSetBySlippiData({
 				stationNumber: ctx.station.startggStationNumber,
 				gameEnd,
@@ -111,6 +123,10 @@ export const slippiRouter = router({
 					// and for some reason i don't see any details in the logs.
 				})
 				.finally(() => {
+					updateStationSync(ctx.station.startggStationNumber, (station) => {
+						station.slippi.shouldReportSetOnGameEnd = false;
+					});
+
 					// parser.reset() is necessary for SlpParserEvent.SETTINGS to be emitted again
 					connectionSet.parser.reset();
 				});
