@@ -20,7 +20,14 @@ export const fetchStartGG = async (
 		body: JSON.stringify({ query, variables }),
 	});
 
-	const json = await response.json();
+	let json;
+
+	try {
+		json = await response.json();
+	} catch (error) {
+		throw new Error("Startgg replied with invalid JSON: " + await response.text())
+	}
+
 	const result = StartGGGraphQLResponse(json);
 
 	if (result instanceof type.errors) {

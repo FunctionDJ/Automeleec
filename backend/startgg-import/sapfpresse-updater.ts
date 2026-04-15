@@ -29,6 +29,9 @@ const fetchStartGGAndUpdateState = async () => {
     query StreamQueues {
       streamQueue(tournamentId: ${globalState.startggTournamentId}, includePlayerStreams: false) {
         id
+        stream {
+          streamName
+        }
         sets {
           id
           fullRoundText
@@ -80,18 +83,21 @@ const fetchStartGGAndUpdateState = async () => {
 		streamQueue: type({
 			id: "string",
 			sets: SetType.array(),
+      stream: {
+        streamName: "string"
+      }
 		}).array(),
 	}).assert(data);
 
 	const streamQueue = validatedData.streamQueue.find(
-		(sq) => sq.id === globalState.startggStreamQueueIdToTrack,
+		(sq) => sq.stream.streamName === "german_melee", // TODO !
 	);
 
 	if (streamQueue === undefined) {
 		const message = `Stream queue with id ${globalState.startggStreamQueueIdToTrack} not found in start.gg response, either wrong tournament or deleted stream queue configured`;
-
+    
 		prefixLogger("StartggImport").warn(message);
-return
+    return
 		// throw new Error(message);
 	}
 

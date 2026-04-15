@@ -164,9 +164,11 @@ export const reportBracketSetBySlippiData = async ({
 
 	let sendWinner = false;
 
-	if (currentSet.entrantA.score + 1 >= Math.ceil(station.bestOf / 2) || currentSet.entrantB.score + 1 >= Math.ceil(station.bestOf / 2)) {
-		sendWinner = true
-	}
+	// if (currentSet.entrantA.score + 1 >= Math.ceil(station.bestOf / 2) || currentSet.entrantB.score + 1 >= Math.ceil(station.bestOf / 2)) {
+	// 	sendWinner = true
+	// }
+
+	// TODO !
 
 
 	logger.info(`sendWinner: ${sendWinner}`);

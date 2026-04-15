@@ -6,6 +6,8 @@ import {
 	entrantToTag,
 } from "../shared-frontend/entrant-to-x";
 import { PlayerRow, type EntrantInScoreboard } from "./PlayerRow";
+import { AnimatePresence, motion } from "motion/react";
+import { Stroked } from "./Stroked";
 
 interface Props {
 	uniqueKey: string;
@@ -34,11 +36,11 @@ const getEntrantInScoreboard = (
 		case "basic-text-override": {
 			return entrantKey === "entrantB"
 				? {
-						tag: station.basicTextOverride,
-						pronouns: "",
-						score: null,
-						characters: [],
-					}
+					tag: station.basicTextOverride,
+					pronouns: "",
+					score: null,
+					characters: [],
+				}
 				: emptyEntrantInScoreboard;
 		}
 		case "entrant-override": {
@@ -107,6 +109,22 @@ export const PlayerBox = ({
 				entrant={entrantBInScoreBoard}
 				align={align}
 			/>
+			<AnimatePresence mode="wait">
+				<motion.span
+					key={uniqueKey + station?.currentSet?.fullRoundText}
+					initial={{ opacity: 0, scale: 0.5 }}
+					animate={{ opacity: 1, scale: 1 }}
+					exit={{ opacity: 0, transition: { duration: 0.1 } }}
+					transition={{
+						duration: 0.4,
+						type: "spring",
+					}}
+					className={`absolute text-3xl font-mono font-extrabold flex top-[-3vw] ${align === "L" ? "left-[2.5vw]" : "right-[2.5vw]"}`}
+				>
+
+					<Stroked stroke={0.4}>{station?.currentSet?.fullRoundText}</Stroked>
+				</motion.span>
+			</AnimatePresence>
 		</div>
 	);
 };
