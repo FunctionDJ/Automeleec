@@ -30,13 +30,13 @@ Currently designed for quad-streams (4 stations/setups streamed at once) but wil
 - ...updates picked characters and scores on the overlay automatically using Slippi networking
 - ...reports characters, stages and scores to start.gg
 - ...records Slippi replays in a naming convention that's compatible with [slp2mp4](https://github.com/davisdude/slp2mp4) to the computer running AM with zero manual input
-- ...respects handwarmers and doesn't record them and doens't report them to start.gg
+- ...respects handwarmers and doesn't record them and doesn't report them to start.gg
 - ...updates the self-service portal with the current set status, players, score, and upcoming sets for a given station
 - ...saves the application state (like overrides and Wii IPs) to the computer and loads it on restart
 
 ### Edge-case resistant
 
-A match/game of a set needs to be replayed but was already reported to start.gg? No worries! Simply remove the game on start.gg and AM will update the overlay's score after a few seconds.
+A match/game of a set needs to be replayed but was already reported to start.gg? No worries! Simply remove the set's last game on start.gg and AM will update the overlay's score after a few seconds.
 
 Need to replay a full set? Use the "Reset Set" feature on the self-service portal. You can also do this on start.gg and change the station if needed.
 
@@ -44,17 +44,27 @@ AM outsources data storage to start.gg as much as possible, so in many cases you
 
 ### Easy-as-pie port entry
 
-The only data that AM needs that can't be automated or configured all in advance of the tournament is which player is plugged into which port.
+The only data that AM needs that can't be automated or configured before the tournament is which player is plugged into which port.
 
-AM helps "automate" this data entry by providing a "self-service portal" designed for touch devices that can be used by TOs in a portable manner or stationary by players to guide them through the easy setup process for their set and get the port data.
+AM helps "automate" this data entry by providing a self-service portal designed for touch devices that can be used by TOs in a portable manner or stationary by players to guide them through the easy setup process for their set and get the port data.
 
 ![Screenshot of self-service portal with the ports dialog open](docs/self-service%20portal%20ports.png)
 
 The self-service portal shows the current sets and asks players about handwarmers before starting a set and then asks for the port mapping (see screenshots above). This is almost always all the human data entry that's needed, but the portal also provides features to change the port mapping during sets or reset the set (e.g. if handwarmers were played after starting the set).
 
+### No USB hotswapping needed
+
+Because AM always knows which set is being played on any connected station and reads Slippi data from the network, it can record replays to the computer and report sets to start.gg including character and stage picks. Replays are automatically named in an [slp2mp4](https://github.com/davisdude/slp2mp4) compatible fashion for it's directory mode with clear folder names and mechanisms to avoid losing any replays for the unlikely case of there being a file or folder name collision.
+
+Since AM is experimental, it's recommended to keep USBs inserted in the Wiis regardless and enable replays in Slippi Nintendont as a backup replay recording. If anything is wrong with AM's recorded replays, you'll have to sort through the replays from the USB, but at least you have the backup.
+
+Of course you can also just continue to instruct players to use hotswapping and it's going to work without any issues with AM.
+
+Keep in mind that AM (in auto mode) will report set results automatically which other reporting tools like [Replay Manager](https://github.com/jmlee337/replay-manager-for-slippi) might not expect. Using Replay Manager for stations that were monitored by AM in auto mode is untested as of writing.
+
 ### All of the flexibility
 
-Some more features that AM provides for when automation is not possible or desired:
+What if automation is not possible or desired, or you need to go off-script and do something that can't be expressed with a start.gg set?
 
 - "Simple Text Override" mode: shows an editable text field in the dashboard that's shown in the overlay instead of the automatic data
 - "Custom Players" mode: a classic Melee scoreboard mode where all structural data that's usually automatically populated can be entered by hand, like player names, scores, and characters
